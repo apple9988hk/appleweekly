@@ -1,15 +1,10 @@
-image: node:16.14.2 # change to match your project's node version
-
-cache:
-  paths:
-    - node_modules/
-
+# The Docker image that will be used to build your app
+image: node:16.14.2
+# Functions that should be executed before the build script is run
 before_script:
   - rm -rf build
   - CI=false npm install
-
 pages:
-  stage: deploy
   script:
     - CI=false npm run build
     - rm -rf public
@@ -17,6 +12,9 @@ pages:
     - mv build public
   artifacts:
     paths:
+      # The folder that contains the files to be exposed at the Page URL
       - public
-  only:
-    - master
+  rules:
+    # This ensures that only pushes to the default branch will trigger
+    # a pages deploy
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
