@@ -1,6 +1,8 @@
 // import Header from "./component/Header"
 import React, { useState, useReducer } from "react";
 import WeeklyReport from "./component/pages/WeeklyReport";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import JTable from "./component/pages/JTable/JTable";
 
 const initialState = {
   data: [],
@@ -53,7 +55,7 @@ function ImportData(props) {
   );
 }
 
-function App() {
+const MainView = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [state, dispatch] = useReducer(importedDataReducer, initialState);
   let importedData = state.data;
@@ -96,6 +98,17 @@ function App() {
       {/* <hr className="py-10" /> */}
       {activeTab === 1 ? <div> Experimental </div> : null}
     </div>
+  );
+}
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainView />} />
+        <Route path="jtable" element={<JTable />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
