@@ -55,7 +55,7 @@ function ImportData(props) {
   );
 }
 
-const MainView = () => {
+const App = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [state, dispatch] = useReducer(importedDataReducer, initialState);
   let importedData = state.data;
@@ -101,15 +101,15 @@ const MainView = () => {
   );
 }
 
-const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainView />} />
-        <Route path="jtable" element={<JTable />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+// const App = () => {
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+//         <Route path="/" element={<MainView />} />
+//         <Route path="jtable" element={<JTable />} />
+//       </Routes>
+//     </BrowserRouter>
+//   );
+// }
 
 export default App;
