@@ -1,6 +1,8 @@
 # The Docker image that will be used to build your app
 image: node:16.14.2
 # Functions that should be executed before the build script is run
+variables:
+    PUBLIC_URL: "/appleweekly" # slash is important
 before_script:
   - rm -rf build
   - CI=false npm install
@@ -9,6 +11,7 @@ pages:
     - CI=false npm run build
     - rm -rf public
     - cp build/index.html build/404.html
+    - cp public/index.html public/404.html
     - mv build public
   artifacts:
     paths:
