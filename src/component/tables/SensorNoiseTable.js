@@ -113,7 +113,7 @@ function SensorNoiseTable(props) {
   // console.log(state);
   return (
     <div className = "py-2">
-      <h1 className="font-bold text-2xl px-2 underline py-2 "> {topic}</h1>
+      {/* <h1 className="font-bold text-2xl px-2 underline py-2 "> {topic}</h1> */}
       <SortableTable state={state} dispatch={dispatch} />
     </div>
   );

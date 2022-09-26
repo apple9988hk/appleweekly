@@ -129,7 +129,7 @@ function DTSTable(props) {
 
   return (
     <div className="py-2">
-      <h1 className="font-bold text-2xl px-2 underline py-2 "> {topic}</h1>
+      {/* <h1 className="font-bold text-2xl px-2 underline py-2 "> {topic}</h1> */}
       <div id="input" className="mx-2 my-2 max-w-lg">
         <input type="text" placeholder="Material Filter" className="input input-bordered input-sm px-4 py-3 w-full max-w-xs" onChange = {handleInputChange}/>
       </div>

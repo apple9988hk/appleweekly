@@ -96,7 +96,7 @@ function SelectedDopantPlot(props) {
   const { id, topic, data } = dataset;
   return (
     <div className = "py-2">
-      <h1 className="font-bold text-2xl px-2 underline py-2 "> {topic}</h1>
+      {/* <h1 className="font-bold text-2xl px-2 underline py-2 "> {topic}</h1> */}
       {data.map((d) => (
         <ChartPlot key={d.material} data={d} />
       ))}

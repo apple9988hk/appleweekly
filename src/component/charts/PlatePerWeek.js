@@ -66,9 +66,24 @@ function PlatePerWeek(props) {
       },
     ],
   };
+
   return (
-    <div className = "py-2">
-      <h1 className="font-bold text-2xl px-2 underline py-2 "> {data.topic}</h1>
+    <div className="py-2">
+      {/* <div className="flex flex-row justify-between items-center">
+        <h1 className="font-bold text-2xl px-2 underline py-2 ">
+          {" "}
+          {data.topic}
+        </h1>
+        <div onClick={handleClick}>
+        {open === false ? (
+          <PlusIcon className="h-7 px-5" />
+        ) : (
+          <MinusIcon className="h-7 px-5" />
+        )}
+        </div>
+
+      </div> */}
+
       <ReactEcharts
         option={option}
         style={{ height: "500px", width: "100%" }}
