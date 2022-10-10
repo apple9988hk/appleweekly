@@ -3,6 +3,7 @@ import React, { useState, useReducer } from "react";
 import WeeklyReport from "./component/pages/WeeklyReport";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import JTable from "./component/pages/JTable/JTable";
+import CPPPlot from "./component/charts/CPPPlot";
 
 const initialState = {
   data: [],
@@ -107,6 +108,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<MainView />} />
         <Route path="jtable" element={<JTable />} />
+        <Route path="test" element={<CPPPlot/>} />
       </Routes>
     </BrowserRouter>
   );

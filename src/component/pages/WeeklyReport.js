@@ -3,6 +3,7 @@ import SelectedDopantPlot from "../charts/SelectedDopantPlot";
 // import ExampleTable from "../tables/ExampleTable";
 import SensorNoiseTable from "../tables/SensorNoiseTable";
 import DTSTable from "../tables/DTSTable";
+import CPPPlot from "../charts/CPPPlot"
 import _ from "lodash";
 import React, { useState } from "react";
 import { PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
@@ -10,7 +11,7 @@ import { PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
 function WeeklyReport(props) {
   const { data } = props;
 
-  const displayIndex = ["NOPPW", "SDP", "DTS", "R30DSNS"];
+  const displayIndex = ["NOPPW", "SDP", "DTS", "R30DSNS", "R50CPP"];
 
   const [selected, setSelected] = useState(["NOPPW"]);
   const isSelected = (name) => selected.indexOf(name) !== -1;
@@ -43,6 +44,8 @@ function WeeklyReport(props) {
         return <SensorNoiseTable data={d} />;
       case "DTS":
         return <DTSTable data={d} />;
+      case "R50CPP":
+          return <CPPPlot data={d} />;
       default:
         return null;
     }
