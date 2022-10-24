@@ -3,13 +3,14 @@ import mergeImages from "merge-images";
 import axios from "axios";
 
 export default function JImage() {
-  const pixel = { width: 752, height: 480 };
+  // const pixel = { width: 752, height: 480 };
   const toDisplay = { width: 1250 };
   const [mergedSrc, setMergedSrc] = useState(null);
   const [mergedImageSize, setMergedImageSize] = useState({
     width: null,
     height: null,
   });
+  const [pixel, setPixel] = useState({ width: 0, height: 0 });
   const [textInfo, setTextInfo] = useState(null);
   const [fetched, setFetched] = useState([]);
   const [fetchId, setFetchId] = useState("");
@@ -27,6 +28,7 @@ export default function JImage() {
       setFetchStatus("Loading");
       setMergedSrc(null);
       setTextInfo(null);
+      setPixel({ width: 0, height: 0 });
       setFetched([]);
       const snapshot = await axios.get(
         `http://tmdata.udc.local/api/spectral/pixel-image/${fetchId}`
@@ -42,11 +44,25 @@ export default function JImage() {
   const toggleDisplayText = () => {
     setDisplayTextOption(!displayTextOption);
   };
+  const getImageSize = async (PixelImage) => {
+    var img = document.createElement("img");
+    await img.setAttribute("src", "data:image/png;base64," + PixelImage);
+    setPixel({ width: img.width, height: img.height });
+    console.log({ width: img.width, height: img.height });
+    console.log("1");
+  };
   useEffect(() => {
     if (fetched.length > 0) {
-      const w = pixel.width * 8;
-      const h = pixel.height * Math.ceil(fetched.length / 8);
-      setMergedImageSize({ width: w, height: h });
+      getImageSize(fetched[0].PixelImage);
+    }
+  }, [fetched]);
+
+  useEffect(() => {
+    if (pixel.height > 0) {
+      setMergedImageSize({
+        width: pixel.width * 8,
+        height: pixel.height * Math.ceil(fetched.length / 8),
+      });
       let toMerge = fetched.map(function (d, index) {
         return {
           src: "data:image/png;base64," + d.PixelImage,
@@ -65,8 +81,8 @@ export default function JImage() {
         })
       );
       mergeImages(toMerge, {
-        width: w,
-        height: h,
+        width: pixel.width * 8,
+        height: pixel.height * Math.ceil(fetched.length / 8),
       })
         .then((merged) => {
           setMergedSrc(merged);
@@ -74,7 +90,8 @@ export default function JImage() {
         })
         .catch((err) => console.log(err));
     }
-  }, [fetched]);
+  }, [pixel]);
+
   return (
     <div className="max-w-7xl mx-auto px-5">
       <div className="font-bold text-3xl">JImage</div>
@@ -120,7 +137,7 @@ export default function JImage() {
           {fetchStatus !== "Idle" ? (
             <div className="flex justify-center items-center">
               <button className="btn loading bg-white border-hidden text-gray-700">
-              {fetchStatus}
+                {fetchStatus}
               </button>
             </div>
           ) : null}
@@ -204,3 +221,5 @@ const Canvas = ({
     </div>
   );
 };
+
+// chrome://flags/#block-insecure-private-network-requests
