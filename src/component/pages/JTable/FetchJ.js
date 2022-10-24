@@ -15,7 +15,6 @@ export default function FetchJ() {
     } else {
       dispatch(fetchJData(fetchId));
     }
-
   };
 
   return (
@@ -28,9 +27,6 @@ export default function FetchJ() {
           onChange={(e) => setFetchId(e.target.value)}
         />
       </div>
-      {
-
-      }
       <button className = {`btn btn-outline btn-sm ${jdataStatus === 'loading' ? "loading" : ''}`}  onClick={addJData} > Fetch </button>
     </div>
   );

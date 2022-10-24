@@ -4,6 +4,7 @@ import WeeklyReport from "./component/pages/WeeklyReport";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import JTable from "./component/pages/JTable/JTable";
 import CPPPlot from "./component/charts/CPPPlot";
+import JImage from "./component/pages/JImage/JImage"
 
 const initialState = {
   data: [],
@@ -109,6 +110,7 @@ const App = () => {
         <Route path="/" element={<MainView />} />
         <Route path="jtable" element={<JTable />} />
         <Route path="test" element={<CPPPlot/>} />
+        <Route path="jimage" element={<JImage/>} />
       </Routes>
     </BrowserRouter>
   );

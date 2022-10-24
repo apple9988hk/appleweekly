@@ -1,63 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addtoWatchList } from "../../../features/jdata/jdataSlice";
 
-
 function FetchedJDisplay() {
-const jdataset = useSelector((state) => state.jdata.data);
+  const jdataset = useSelector((state) => state.jdata.data);
+  const idList = useSelector((state) => state.jdata.idList);
+  // const [idList, setIdList] = useState([]);
 
-console.log("jdataset")
-console.log(jdataset)
+  // const idList = [
+  //   ...new Set(jdataset.map(({ SampleID }) => SampleID.slice(0, 10))),
+  // ];
+
+  console.log("jdataset");
+  console.log(idList)
+  console.log(jdataset);
 
   return (
     <div>
-        <SortableTable data ={jdataset} />
+      <SortableTable data={idList} />
       {/* {jdataset.map((item, index) => {
         return <p key={item.id}>{item.keywords}</p>;
       })} */}
-    
     </div>
-  )
+  );
 }
 
-
 function SortableTable(props) {
-    const { data } = props;
-    const dispatch = useDispatch();
-  
-    return (
-      <div className="flex flex-col">
-        {/* <div> 
-        <button onClick={() => dispatch(addtoWatchList(1))} > 1 </button> <br/>
-        <button onClick={() => dispatch(addtoWatchList(2))} > 2 </button> <br/>
-        <button onClick={() => dispatch(addtoWatchList(3))} > 3 </button>
-        </div> */}
-        <div className="flex-grow overflow-auto">
-          <table className="relative w-full border">
-            <tbody className="bg-white divide-y divide-gray-200">
-              {data.map(function (d, index) {
-                return (
-                  <tr key={index} onClick={() => dispatch(addtoWatchList(d['id'])) } >
-                    <td
-                        className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center"
-                    >
-                        {d['id']}
-                    </td>
-                    <td
-                        className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center"
-                    >
-                        {d['keywords']}
-                    </td>
+  const { data } = props;
+  const dispatch = useDispatch();
 
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+  return (
+    <div className="flex flex-col">
+      <div className="flex-grow overflow-auto">
+        Fetched Plate Data
+        <table className="relative w-full border">
+          <tbody className="bg-white divide-y divide-gray-200">
+            {data.map(function (d, index) {
+              return (
+                <tr
+                  key={index}
+                  onClick={() => dispatch(addtoWatchList(d['id']))}
+                >
+                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
+                    {d['id']}
+                  </td>
+                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
+                    {d["keywords"]}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-export default FetchedJDisplay
-
+export default FetchedJDisplay;

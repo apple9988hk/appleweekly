@@ -1,26 +1,59 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-const axios = require("axios");
+import _ from "lodash";
+// const axios = require("axios");
 const API_URL = "https://jvldata.udc.local/getPlotData";
+// const https = require('https');
+const axios = require('axios')
+// const https = require('https');
 
 const initialState = {
   data: [],
+  idList: [],
   status: "idle",
   error: null,
   watchList: [],
 };
 
 export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
-  const headers = {
-    "accept-encoding" : "gzip, deflate, br",
-    "accept-language" : "en-US,en;q=0.9",
-    "content-length": "26",
-  }
-  const snapshot = await axios.post(API_URL, JSON.stringify({ runNumber: id }), headers);
-  let newdata = snapshot.data;
-  newdata["id"] = id;
+  let newdata = {};
+  const snapshot = await axios.get(`http://tmdata.udc.local/api/spectral/log/${id}`);
+  const snapshot2 = await axios.get(`http://tmdata.udc.local/api/jvl/summary/${id}`);
+  const keyword = await axios.post(
+    "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id+"-1d1" }])
+  );
+  // console.log("keywords")
+  // console.log(keyword.data)
+  // console.log("snapshot")
+  // console.log(snapshot.data)
+  // console.log("snapshot2")
+  // console.log(snapshot2.data)
+  let merged = snapshot.data.map( 
+    function(d ) {
+      console.log(snapshot2.data)
+      console.log(d.SampleID)
+      let e = _.filter(snapshot2.data, function (o) {
+          return (
+            o.Filename === d.SampleID
+          );
+        })
+      console.log(e)
+      return (
+        {
+          ...d,
+          ...e[0]
+    }
+      )
+    }
+  )
+  // console.log("merged")
+  // console.log(merged)
+  
+  newdata['data'] = merged;
+  newdata['id'] = id;
+  newdata['keywords'] = keyword.data[0]['keywords'];
+  newdata['substrate'] = keyword.data[0]['substrate'];
   return newdata;
 });
-
 
 export const jdataSlice = createSlice({
   name: "jdata",
@@ -46,11 +79,9 @@ export const jdataSlice = createSlice({
     },
     [fetchJData.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      // console.log('hihihih')
-      // console.log(action)
-      // if (action.payload){
-      state.data.push(action.payload);
-      // }
+      console.log(action.payload)
+      state.data = state.data.concat(action.payload.data)
+      state.idList.push({"id":action.payload.id, "keywords": action.payload.keywords})
     },
     [fetchJData.rejected]: (state, action) => {
       state.status = "failed";
