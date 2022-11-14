@@ -3,8 +3,11 @@ import React, { useState, useReducer } from "react";
 import WeeklyReport from "./component/pages/WeeklyReport";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import JTable from "./component/pages/JTable/JTable";
+import SData from "./component/pages/SData/SData";
 import CPPPlot from "./component/charts/CPPPlot";
 import JImage from "./component/pages/JImage/JImage"
+import Exp from "./component/pages/Exp/Exp"
+import RecentPlate from "./component/pages/RecentPlate/RecentPlate"
 
 const initialState = {
   data: [],
@@ -82,7 +85,16 @@ const MainView = () => {
           onClick={() => setActiveTab(1)}
         >
           {" "}
-          Experimental
+          JImage
+        </div>
+        <div
+          className={
+            "tab tab-lg tab-bordered " + (activeTab === 2 ? "tab-active" : null)
+          }
+          onClick={() => setActiveTab(2)}
+        >
+          {" "}
+          SData
         </div>
       </div>
       {activeTab === 0 ? (
@@ -98,7 +110,8 @@ const MainView = () => {
         </div>
       ) : null}
       {/* <hr className="py-10" /> */}
-      {activeTab === 1 ? <div> Experimental </div> : null}
+      {activeTab === 1 ? <div> <JImage/> </div> : null}
+      {activeTab === 2 ? <div> <SData/> </div> : null}
     </div>
   );
 }
@@ -109,8 +122,11 @@ const App = () => {
       <Routes>
         <Route path="/" element={<MainView />} />
         <Route path="jtable" element={<JTable />} />
+        <Route path="sdata" element={<SData />} />
         <Route path="test" element={<CPPPlot/>} />
         <Route path="jimage" element={<JImage/>} />
+        <Route path="exp" element={<Exp/>} />
+        <Route path="recentplate" element={<RecentPlate/>} />
       </Routes>
     </BrowserRouter>
   );

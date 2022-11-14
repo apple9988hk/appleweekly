@@ -24,13 +24,13 @@ function CPPPlot(props) {
       },
     ],
     legend: {
-      data: ['c1-Pressure', 'c2-Pressure', 'c1-Cryo Temp', 'c2-Cryo Temp']
+      data: ['c1-Pressure', 'c2-Pressure', 'c1-Cryo Temp', 'c2-Cryo Temp'],
+      animation: false,
   },
     tooltip: {
       trigger: "axis",
       axisPointer: {
         type: "cross",
-        animation: false,
         label: {
           backgroundColor: "#505765",
         },
@@ -38,7 +38,7 @@ function CPPPlot(props) {
     },
     dataZoom: [
       {
-        startValue: "2014-06-01",
+        startValue: "2022-06-01",
       },
       {
         type: "inside",
@@ -49,25 +49,34 @@ function CPPPlot(props) {
         name: "c1-Pressure",
         type: "line",
         data: data["data"]["c1p"],
+        animation: false,
+        showSymbol: false,
       },
       {
         name: "c2-Pressure",
         type: "line",
         data: data["data"]["c2p"],
+        animation: false,
+        showSymbol: false,
       },
       {
         name: "c1-Cryo Temp",
         type: "line",
         yAxisIndex: 1,
         data: data["data"]["c1t"],
+        animation: false,
+        showSymbol: false,
       },
       {
         name: "c2-Cryo Temp",
         type: "line",
         yAxisIndex: 1,
         data: data["data"]["c2t"],
+        animation: false,
+        showSymbol: false,
       },
     ],
+    animation: false
   };
 
   return (

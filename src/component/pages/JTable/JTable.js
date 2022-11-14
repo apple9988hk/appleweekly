@@ -1,6 +1,3 @@
-import {useState, useEffect} from 'react'
-import axios from 'axios'
-// import Counter from "./Counter"
 import FetchJ from "./FetchJ"
 import FetchedJDisplay from "./FetchedJDisplay"
 import JTableSingle from "./JTableSingle"

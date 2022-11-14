@@ -21,12 +21,6 @@ export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
   const keyword = await axios.post(
     "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id+"-1d1" }])
   );
-  // console.log("keywords")
-  // console.log(keyword.data)
-  // console.log("snapshot")
-  // console.log(snapshot.data)
-  // console.log("snapshot2")
-  // console.log(snapshot2.data)
   let merged = snapshot.data.map( 
     function(d ) {
       console.log(snapshot2.data)
@@ -54,6 +48,37 @@ export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
   newdata['substrate'] = keyword.data[0]['substrate'];
   return newdata;
 });
+
+
+export const fetchSpectral = createAsyncThunk("users/fetchSpectral", async (id) => {
+  let newdata = {};
+  const snapshot = await axios.get(`http://tmdata.udc.local/api/spectral/${id}`);
+  const keyword = await axios.post(
+    "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id+"-1d1" }])
+  );
+  let merged = snapshot.data.map( 
+    function( d ) {
+      console.log(snapshot.data)
+      console.log(d.SampleID)
+      return (
+        {
+          ...d,
+
+    }
+      )
+    }
+  )
+  // console.log("merged")
+  // console.log(merged)
+  
+  newdata['data'] = merged;
+  newdata['id'] = id;
+  newdata['keywords'] = keyword.data[0]['keywords'];
+  newdata['substrate'] = keyword.data[0]['substrate'];
+  return newdata;
+});
+
+
 
 export const jdataSlice = createSlice({
   name: "jdata",

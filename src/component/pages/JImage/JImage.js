@@ -22,9 +22,9 @@ export default function JImage() {
   // const [src, setSrc] = useState(null);
 
   const addJImage = async () => {
-    if (fetchId.length !== 10) {
-      console.log("Invalid Id");
-    } else {
+    // if (fetchId.length !== 10) {
+    //   console.log("Invalid Id");
+    // } else {
       setFetchStatus("Loading");
       setMergedSrc(null);
       setTextInfo(null);
@@ -35,7 +35,7 @@ export default function JImage() {
       );
       setFetched(snapshot.data);
       setFetchStatus("Drawing");
-    }
+    // }
   };
 
   const toggleFullSize = () => {

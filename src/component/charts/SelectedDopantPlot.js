@@ -3,6 +3,7 @@ import ReactEcharts from "echarts-for-react";
 
 function ChartPlot(props) {
   const { Qe, RunID, Voltage, date, keyword, material } = props.data;
+  console.log(props.data)
   const option = {
     title: {
       text: material,
@@ -20,6 +21,13 @@ function ChartPlot(props) {
           backgroundColor: "#505765",
         },
       },
+      formatter: function (params) {
+        var res = RunID[params[0].dataIndex] + '<br/>' + params[0].name;
+        for (var i = 0, l = params.length; i <2; i++ ){
+          res += '<br/> <span style="font-weight:bold;">'+  params[i].seriesName +'</span> :' + params[i].value;
+        }
+        return res
+      }
     },
     legend: {
       data: ["EQE", "Voltage"],
@@ -75,6 +83,7 @@ function ChartPlot(props) {
         type: "line",
         smooth: true,
         data: Qe,
+        runId: RunID
       },
       {
         name: "Voltage",
@@ -82,6 +91,7 @@ function ChartPlot(props) {
         type: "line",
         smooth: true,
         data: Voltage,
+        runId: RunID
       },
     ],
   };
