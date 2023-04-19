@@ -54,7 +54,7 @@ function LEChart(props) {
     grid: {
       left: "3%",
       right: "7%",
-      bottom: "7%",
+      bottom: "10%",
       containLabel: true,
     },
     tooltip: {
@@ -95,15 +95,18 @@ function LEChart(props) {
     xAxis: [
       {
         type: "value",
+        name: "CIE_X",
         scale: true,
         axisLabel: {
           formatter: "{value}",
         },
+        nameLocation: 'middle',
       },
     ],
     yAxis: [
       {
         type: "value",
+        name: "cd/A",
         scale: true,
         axisLabel: {
           formatter: "{value}",

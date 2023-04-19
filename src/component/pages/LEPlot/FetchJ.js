@@ -10,11 +10,14 @@ export default function FetchJ() {
   const [fetchId, setFetchId] = useState("");
 
   const addJData = () => {
-    if (fetchId.length !== 10) {
-      console.log("Invalid Id")
-    } else {
-      dispatch(fetchJData(fetchId));
-    }
+    let idList = fetchId.split(",");
+    idList.forEach((d) => {
+      if (d.length !== 10) {
+        console.log("Invalid Id");
+      } else {
+        dispatch(fetchJData(d));
+      }
+    });
   };
 
   return (
@@ -27,7 +30,15 @@ export default function FetchJ() {
           onChange={(e) => setFetchId(e.target.value)}
         />
       </div>
-      <button className = {`btn btn-outline btn-sm ${jdataStatus === 'loading' ? "loading" : ''}`}  onClick={addJData} > Fetch </button>
+      <button
+        className={`btn btn-outline btn-sm ${
+          jdataStatus === "loading" ? "loading" : ""
+        }`}
+        onClick={addJData}
+      >
+        {" "}
+        Fetch{" "}
+      </button>
     </div>
   );
 }

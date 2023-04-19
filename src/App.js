@@ -99,6 +99,15 @@ const MainView = () => {
           {" "}
           SData
         </div>
+        <div
+          className={
+            "tab tab-lg tab-bordered " + (activeTab === 3 ? "tab-active" : null)
+          }
+          onClick={() => setActiveTab(3)}
+        >
+          {" "}
+          LE Plot
+        </div>
       </div>
       {activeTab === 0 ? (
         <div>
@@ -115,6 +124,7 @@ const MainView = () => {
       {/* <hr className="py-10" /> */}
       {activeTab === 1 ? <div> <JImage/> </div> : null}
       {activeTab === 2 ? <div> <SData/> </div> : null}
+      {activeTab === 3 ? <div> <LEPlot/> </div> : null}
     </div>
   );
 }
