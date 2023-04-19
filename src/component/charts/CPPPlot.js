@@ -3,6 +3,7 @@ import ReactEcharts from "echarts-for-react";
 
 function CPPPlot(props) {
   const {data} = props
+  console.log(data)
   const option = {
     xAxis: {
       type: "time",

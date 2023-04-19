@@ -8,6 +8,9 @@ import CPPPlot from "./component/charts/CPPPlot";
 import JImage from "./component/pages/JImage/JImage"
 import Exp from "./component/pages/Exp/Exp"
 import RecentPlate from "./component/pages/RecentPlate/RecentPlate"
+import LTView from "./component/pages/LT/LTView.js"
+import LEPlot from "./component/pages/LEPlot/LEPlot"
+
 
 const initialState = {
   data: [],
@@ -122,11 +125,13 @@ const App = () => {
       <Routes>
         <Route path="/" element={<MainView />} />
         <Route path="jtable" element={<JTable />} />
+        <Route path="leplot" element={<LEPlot />} />
         <Route path="sdata" element={<SData />} />
         <Route path="test" element={<CPPPlot/>} />
         <Route path="jimage" element={<JImage/>} />
         <Route path="exp" element={<Exp/>} />
         <Route path="recentplate" element={<RecentPlate/>} />
+        <Route path="LT" element={<LTView/>} />
       </Routes>
     </BrowserRouter>
   );

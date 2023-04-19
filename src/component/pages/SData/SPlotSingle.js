@@ -150,13 +150,12 @@ function SingleLinePlot(props) {
   }
   return (
     <div>
-
       <ReactEcharts
         option={option}
         notMerge ={true}
         style={{ height: "500px", width: "100%" }}
       />
-            <div className="font-bold"> Normalized </div>
+      <div className="font-bold"> Normalized </div>
       <ReactEcharts
         option={option_normalized}
         notMerge ={true}
