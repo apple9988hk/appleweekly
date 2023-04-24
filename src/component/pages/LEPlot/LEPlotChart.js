@@ -44,9 +44,10 @@ function LEChart(props) {
         focus: "series",
       },
       symbolSize: 5,
-      data: filtered.map((d) => [d.Cie_x, d.CdA, d.SampleID]),
+      data: filtered.map((d) => [d.Cie_x, d.CdA, d.SampleID, Number(d.SampleID.slice(11,12))]),
     });
   });
+  // console.log(newSeries)
   const option = {
     title: {
       text: "LE vs CIE_X",
@@ -54,7 +55,7 @@ function LEChart(props) {
     grid: {
       left: "3%",
       right: "7%",
-      bottom: "10%",
+      bottom: "12.5%",
       containLabel: true,
     },
     tooltip: {
@@ -101,19 +102,42 @@ function LEChart(props) {
           formatter: "{value}",
         },
         nameLocation: 'middle',
+        nameGap: 30
       },
     ],
     yAxis: [
       {
         type: "value",
-        name: "cd/A",
+        name: "LE @10J [cd/A]",
         scale: true,
         axisLabel: {
           formatter: "{value}",
         },
+        nameLocation: 'middle',
+        nameGap: 40
       },
     ],
     series: newSeries,
+    visualMap: [
+      {
+        left:10,
+        type: "piecewise",
+        splitNumber: 3,
+        dimension: 3,
+        min: 1,
+        max: 9,
+        inRange: {
+          symbol: ['circle','square','triangle']
+        },
+        formatter: function (value, value2) {
+          return 'c' + Math.floor(value) + "- c" + Math.floor(value2);
+        },
+        itemHeight : 8,
+        itemWidth : 9,
+        textStyle:{
+          fontSize :9
+        }
+      }]
   };
   return (
     <div className="pb-10">
@@ -128,7 +152,7 @@ function LEChart(props) {
 
 function JTableSingleTable(props) {
   const { data } = props;
-  console.log(data);
+  // console.log(data);
   const dataToShow = [
     "SampleID",
     "Wvl_nm",

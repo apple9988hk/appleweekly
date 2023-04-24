@@ -10,6 +10,7 @@ import Exp from "./component/pages/Exp/Exp"
 import RecentPlate from "./component/pages/RecentPlate/RecentPlate"
 import LTView from "./component/pages/LT/LTView.js"
 import LEPlot from "./component/pages/LEPlot/LEPlot"
+import TableTest from "./component/pages/TableTest/TableTest"
 
 
 const initialState = {
@@ -142,6 +143,7 @@ const App = () => {
         <Route path="exp" element={<Exp/>} />
         <Route path="recentplate" element={<RecentPlate/>} />
         <Route path="LT" element={<LTView/>} />
+        <Route path="TableTest" element={<TableTest/>} />
       </Routes>
     </BrowserRouter>
   );

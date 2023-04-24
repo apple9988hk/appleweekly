@@ -21,24 +21,27 @@ export default function FetchJ() {
   };
 
   return (
-    <div className="flex flex-row w-full max-w-lg py-5 items-center px-5">
-      <div className="form-control pr-2 w-full">
-        <input
-          type="text"
-          placeholder="Input id"
-          className="input input-bordered input-sm w-full max-w-2xl"
-          onChange={(e) => setFetchId(e.target.value)}
-        />
+    <div>
+      <div className="flex flex-row w-full max-w-lg py-5 items-start px-5">
+        <div className="form-control pr-2 w-full">
+          <input
+            type="text"
+            placeholder="Input id"
+            className="input input-bordered input-sm w-full max-w-2xl"
+            onChange={(e) => setFetchId(e.target.value)}
+          />
+      <span className="label-text-alt px-1">Ex: H-041123-1,H-041123-2,H-041123-3 </span>
+        </div>
+        <button
+          className={`btn btn-outline btn-sm ${
+            jdataStatus === "loading" ? "loading" : ""
+          } py pt-0`}
+          onClick={addJData}
+        >
+          {" "}
+          Fetch{" "}
+        </button>
       </div>
-      <button
-        className={`btn btn-outline btn-sm ${
-          jdataStatus === "loading" ? "loading" : ""
-        }`}
-        onClick={addJData}
-      >
-        {" "}
-        Fetch{" "}
-      </button>
     </div>
   );
 }
