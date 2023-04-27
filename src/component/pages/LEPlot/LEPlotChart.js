@@ -130,7 +130,7 @@ function LEChart(props) {
           symbol: ['circle','square','triangle']
         },
         formatter: function (value, value2) {
-          return 'c' + Math.floor(value) + "- c" + Math.floor(value2);
+          return 'c' + Math.ceil(value) + "- c" + Math.floor(value2);
         },
         itemHeight : 8,
         itemWidth : 9,

@@ -12,10 +12,11 @@ export default function FetchJ() {
   const addJData = () => {
     let idList = fetchId.split(",");
     idList.forEach((d) => {
-      if (d.length !== 10) {
+      console.log(d)
+      if (d.trim().length !== 10) {
         console.log("Invalid Id");
       } else {
-        dispatch(fetchJData(d));
+        dispatch(fetchJData(d.trim()));
       }
     });
   };
