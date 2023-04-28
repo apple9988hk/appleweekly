@@ -156,11 +156,14 @@ function JTableSingleTable(props) {
   const dataToShow = [
     "SampleID",
     "Wvl_nm",
+    "HalfWidth",
     "Cie_x",
     "Cie_y",
     "Voltage",
     "Cdm2",
     "Qe",
+    "CdA",
+    "LmW"
   ];
   let stat = {};
   dataToShow.map(function (d, index) {

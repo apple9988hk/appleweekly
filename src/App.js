@@ -10,7 +10,7 @@ import Exp from "./component/pages/Exp/Exp"
 import RecentPlate from "./component/pages/RecentPlate/RecentPlate"
 import LTView from "./component/pages/LT/LTView.js"
 import LEPlot from "./component/pages/LEPlot/LEPlot"
-import TableTest from "./component/pages/TableTest/TableTest"
+import TableTest from "./component/pages/TableTest/TableTest21"
 
 
 const initialState = {
