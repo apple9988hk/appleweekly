@@ -11,6 +11,7 @@ import RecentPlate from "./component/pages/RecentPlate/RecentPlate"
 import LTView from "./component/pages/LT/LTView.js"
 import LEPlot from "./component/pages/LEPlot/LEPlot"
 import TableTest from "./component/pages/TableTest/TableTest21"
+import Jelly from "./component/pages/Jelly/Jelly"
 
 
 const initialState = {
@@ -144,6 +145,7 @@ const App = () => {
         <Route path="recentplate" element={<RecentPlate/>} />
         <Route path="LT" element={<LTView/>} />
         <Route path="TableTest" element={<TableTest/>} />
+        <Route path="Jelly" element={<Jelly/>} />
       </Routes>
     </BrowserRouter>
   );
