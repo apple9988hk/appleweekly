@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addtoWatchList } from "../../../features/jdata/jdataSlice";
-import { addtoWatchList as addtoWatchListoj } from "../../../features/ojdata/ojdataSlice";
+import {
+  addtoWatchList,
+  move_id_up,
+  move_id_down,
+} from "../../../features/jdata/jdataSlice";
+import {
+  addtoWatchList as addtoWatchListoj,
+  move_id_up as move_id_up_oj,
+  move_id_down as move_id_down_oj,
+} from "../../../features/ojdata/ojdataSlice";
+import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 function FetchedJDisplay() {
   const jdataset = useSelector((state) => state.jdata.data);
@@ -13,7 +22,7 @@ function FetchedJDisplay() {
 
   return (
     <div>
-      <SortableTable data={idList} isMultiJ={false} />
+      <SortableTable data={idList} isMultiJ={false} move_id_down={move_id_down} move_id_up={move_id_up}/>
     </div>
   );
 }
@@ -28,14 +37,20 @@ function FetchedJDisplayOJ() {
 
   return (
     <div>
-      <SortableTable data={idList} isMultiJ={true} />
+      <SortableTable data={idList} isMultiJ={true} move_id_down={move_id_down_oj} move_id_up={move_id_up_oj}/>
     </div>
   );
 }
 
 function SortableTable(props) {
-  const { data, isMultiJ } = props;
+  const { data, isMultiJ, move_id_up, move_id_down } = props;
   const dispatch = useDispatch();
+  const handleMoveUp = (elementName) => {
+    dispatch(move_id_up(elementName));
+  };
+  const handleMoveDown = (elementName) => {
+    dispatch(move_id_down(elementName));
+  };
 
   return (
     <div className="flex flex-col">
@@ -50,11 +65,20 @@ function SortableTable(props) {
                     key={index}
                     onClick={() => dispatch(addtoWatchListoj(d["id"]))}
                   >
-                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
-                      {d["id"]}
-                    </td>
-                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
-                      {d["keywords"]}
+                    <td className="flex justify-around items-center py-2 px-4 whitespace-nowrap text-sm text-gray-500 text-center w-max">
+                      <span className="px-2">{d["id"]} </span>
+                      <button
+                        className="btn btn-xs btn-circle"
+                        onClick={() => handleMoveUp(d["id"])}
+                      >
+                        <ChevronUpIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        className="btn btn-xs btn-circle"
+                        onClick={() => handleMoveDown(d["id"])}
+                      >
+                        <ChevronDownIcon className="h-4 w-4" />
+                      </button>
                     </td>
                   </tr>
                 );
@@ -68,8 +92,20 @@ function SortableTable(props) {
                     key={index}
                     onClick={() => dispatch(addtoWatchList(d["id"]))}
                   >
-                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
-                      {d["id"]}
+                    <td className="flex justify-around items-center py-2 px-4 whitespace-nowrap text-sm text-gray-500 text-center w-max">
+                      <span className="px-2">{d["id"]} </span>
+                      <button
+                        className="btn btn-xs btn-circle"
+                        onClick={() => handleMoveUp(d["id"])}
+                      >
+                        <ChevronUpIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        className="btn btn-xs btn-circle"
+                        onClick={() => handleMoveDown(d["id"])}
+                      >
+                        <ChevronDownIcon className="h-4 w-4" />
+                      </button>
                     </td>
                     <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
                       {d["keywords"]}

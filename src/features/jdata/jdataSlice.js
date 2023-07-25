@@ -97,6 +97,24 @@ export const jdataSlice = createSlice({
         }
         state.watchList.push(action.payload)
       },
+    move_id_up: (state,action) => {
+      const { payload: elementName } = action;
+      const index = state.idList.findIndex((element) => element.id === elementName);
+
+      if (index > 0) {
+        // Swap the element with the previous one
+        [state.idList[index - 1], state.idList[index]] = [state.idList[index], state.idList[index - 1]];
+      }
+    },
+    move_id_down: (state,action) => {
+      const { payload: elementName } = action;
+      const index = state.idList.findIndex((element) => element.id === elementName);
+
+      if (index < state.idList.length - 1) {
+        // Swap the element with the previous one
+        [state.idList[index], state.idList[index + 1]] = [state.idList[index + 1], state.idList[index]];
+      }
+    }
   },
   extraReducers: {
     [fetchJData.pending]: (state, action) => {
@@ -104,10 +122,10 @@ export const jdataSlice = createSlice({
     },
     [fetchJData.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      // console.log(action.payload)
-      // console.log("action.payload")
-      state.data = state.data.concat(action.payload.data)
-      state.idList.push({"id":action.payload.id, "keywords": action.payload.keywords})
+      console.log(action.payload)
+      console.log("action.payload")
+      // state.data = state.data.concat(action.payload.data)
+      // state.idList.push({"id":action.payload.id, "keywords": action.payload.keywords})
 
       action.payload.data.forEach((newElement) => {
         const elementName = newElement.SampleID;
@@ -126,7 +144,7 @@ export const jdataSlice = createSlice({
       const newId = {id: action.payload.id, keywords:action.payload.keywords}
 
       const existingElementIndex = state.idList.findIndex(
-        (element) => element.id === newId
+        (element) => element.id === newId.id
       );
       if (existingElementIndex !== -1) {
         state.idList.splice(existingElementIndex, 1);
@@ -158,5 +176,5 @@ export const jdataSlice = createSlice({
 // export const showJData = (state) => state.jdata.data;
 // export default jdataSlice.reducer;
 
-export const { toIdle, addtoWatchList } = jdataSlice.actions;
+export const { toIdle, addtoWatchList, move_id_up, move_id_down } = jdataSlice.actions;
 export default jdataSlice.reducer;

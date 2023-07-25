@@ -49,6 +49,24 @@ export const ojdataSlice = createSlice({
       }
       state.watchList.push(action.payload);
     },
+    move_id_up: (state,action) => {
+      const { payload: elementName } = action;
+      const index = state.idList.findIndex((element) => element.id === elementName);
+
+      if (index > 0) {
+        // Swap the element with the previous one
+        [state.idList[index - 1], state.idList[index]] = [state.idList[index], state.idList[index - 1]];
+      }
+    },
+    move_id_down: (state,action) => {
+      const { payload: elementName } = action;
+      const index = state.idList.findIndex((element) => element.id === elementName);
+
+      if (index < state.idList.length - 1) {
+        // Swap the element with the previous one
+        [state.idList[index], state.idList[index + 1]] = [state.idList[index + 1], state.idList[index]];
+      }
+    }
   },
   extraReducers: {
     [fetchOJData.pending]: (state, action) => {
@@ -56,8 +74,8 @@ export const ojdataSlice = createSlice({
     },
     [fetchOJData.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      console.log(action.payload);
-      console.log("action.pyaload")
+      // console.log(action.payload);
+      // console.log("action.pyaload")
 
       action.payload.forEach((newElement) => {
         const elementName = newElement.Title;
@@ -108,5 +126,5 @@ export const ojdataSlice = createSlice({
   },
 });
 
-export const { toIdle, addtoWatchList } = ojdataSlice.actions;
+export const { toIdle, addtoWatchList, move_id_up, move_id_down } = ojdataSlice.actions;
 export default ojdataSlice.reducer;
