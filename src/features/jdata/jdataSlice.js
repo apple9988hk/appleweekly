@@ -104,9 +104,36 @@ export const jdataSlice = createSlice({
     },
     [fetchJData.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      console.log(action.payload)
+      // console.log(action.payload)
+      // console.log("action.payload")
       state.data = state.data.concat(action.payload.data)
       state.idList.push({"id":action.payload.id, "keywords": action.payload.keywords})
+
+      action.payload.data.forEach((newElement) => {
+        const elementName = newElement.SampleID;
+        const existingElementIndex = state.data.findIndex(
+          (element) => element.SampleID === elementName
+        );
+
+        // If the element with the same name already exists, delete it before appending the new element
+        if (existingElementIndex !== -1) {
+          state.data.splice(existingElementIndex, 1);
+        }
+        // Append the newElement to state.data
+        state.data.push(newElement);
+      });
+
+      const newId = {id: action.payload.id, keywords:action.payload.keywords}
+
+      const existingElementIndex = state.idList.findIndex(
+        (element) => element.id === newId
+      );
+      if (existingElementIndex !== -1) {
+        state.idList.splice(existingElementIndex, 1);
+      }
+      // Append the newElement to state.data
+      state.idList.push(newId);
+
     },
     [fetchJData.rejected]: (state, action) => {
       state.status = "failed";

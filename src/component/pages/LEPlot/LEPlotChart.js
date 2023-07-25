@@ -181,7 +181,7 @@ function LEChart(props) {
     yAxis: [
       {
         type: "value",
-        name: "LE @10J [cd/A]",
+        name: `LE @${cd}J [cd/A]`,
         scale: true,
         axisLabel: {
           formatter: "{value}",

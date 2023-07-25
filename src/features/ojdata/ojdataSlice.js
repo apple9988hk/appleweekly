@@ -57,15 +57,43 @@ export const ojdataSlice = createSlice({
     [fetchOJData.fulfilled]: (state, action) => {
       state.status = "succeeded";
       console.log(action.payload);
-      state.data = state.data.concat(action.payload);
-      const uniqueFilenames = [
-        ...new Set(state.data.map((d) => d.Title.slice(0, -4))),
-      ];
-      uniqueFilenames.forEach((d) => {
-        if (!state.idList.includes(d)) {
-          state.idList.push({ id: d, keywords: "" });
+      console.log("action.pyaload")
+
+      action.payload.forEach((newElement) => {
+        const elementName = newElement.Title;
+        const existingElementIndex = state.data.findIndex(
+          (element) => element.Title === elementName
+        );
+
+        // If the element with the same name already exists, delete it before appending the new element
+        if (existingElementIndex !== -1) {
+          state.data.splice(existingElementIndex, 1);
         }
+        // Append the newElement to state.data
+        state.data.push(newElement);
       });
+
+      const newId = [
+        ...new Set(action.payload.map((d) => d.Title.slice(0, -4))),
+      ];
+
+      newId.forEach((newId) => {
+        const existingElementIndex = state.idList.findIndex(
+          (element) => element.id === newId
+        );
+        if (existingElementIndex !== -1) {
+          state.idList.splice(existingElementIndex, 1);
+        }
+        // Append the newElement to state.data
+        state.idList.push({ id: newId, keywords: "" });
+
+      })
+
+      // uniqueFilenames.forEach((d) => {
+      //   if (!state.idList.includes(d)) {
+      //     state.idList.push({ id: d, keywords: "" });
+      //   }
+      // });
       const uniqueCD = [...new Set(state.data.map((d) => d.CurrentDensity))];
       uniqueCD.forEach((d) => {
         if (!state.cdList.some((item) => item.cd === d)) {
