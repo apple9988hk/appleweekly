@@ -13,6 +13,12 @@ import LEPlot from "./component/pages/LEPlot/LEPlot"
 import TableTest from "./component/pages/TableTest/TableTest21"
 import Jelly from "./component/pages/Jelly/Jelly"
 
+import FormTest from "./component/pages/Test/TestForm"
+import Flashcard from "./component/pages/Test/Flashcard"
+import Parking from "./component/pages/Parking/Parking"
+import Short from "./component/pages/Short/Short2"
+import OJData from "./component/pages/OJData/OJData"
+
 
 const initialState = {
   data: [],
@@ -146,6 +152,12 @@ const App = () => {
         <Route path="LT" element={<LTView/>} />
         <Route path="TableTest" element={<TableTest/>} />
         <Route path="Jelly" element={<Jelly/>} />
+        <Route path="formTest" element={<FormTest/>} />
+        <Route path="flash" element={<Flashcard/>} />
+        <Route path="parking" element={<Parking/>} />
+        <Route path="Short" element={<Short/>} />
+        <Route path="ojdata" element={<OJData/>} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -1,32 +1,40 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addtoWatchList } from "../../../features/jdata/jdataSlice";
+import { addtoWatchList as addtoWatchListoj } from "../../../features/ojdata/ojdataSlice";
 
 function FetchedJDisplay() {
   const jdataset = useSelector((state) => state.jdata.data);
   const idList = useSelector((state) => state.jdata.idList);
-  // const [idList, setIdList] = useState([]);
-
-  // const idList = [
-  //   ...new Set(jdataset.map(({ SampleID }) => SampleID.slice(0, 10))),
-  // ];
 
   console.log("jdataset");
-  console.log(idList)
+  console.log(idList);
   console.log(jdataset);
 
   return (
     <div>
-      <SortableTable data={idList} />
-      {/* {jdataset.map((item, index) => {
-        return <p key={item.id}>{item.keywords}</p>;
-      })} */}
+      <SortableTable data={idList} isMultiJ={false} />
+    </div>
+  );
+}
+
+function FetchedJDisplayOJ() {
+  const ojdataset = useSelector((state) => state.ojdata.data);
+  const idList = useSelector((state) => state.ojdata.idList);
+
+  console.log("ojdataset");
+  console.log(idList);
+  console.log(ojdataset);
+
+  return (
+    <div>
+      <SortableTable data={idList} isMultiJ={true} />
     </div>
   );
 }
 
 function SortableTable(props) {
-  const { data } = props;
+  const { data, isMultiJ } = props;
   const dispatch = useDispatch();
 
   return (
@@ -34,23 +42,43 @@ function SortableTable(props) {
       <div className="flex-grow overflow-auto">
         Fetched Plate Data
         <table className="relative w-full border">
-          <tbody className="bg-white divide-y divide-gray-200">
-            {data.map(function (d, index) {
-              return (
-                <tr
-                  key={index}
-                  onClick={() => dispatch(addtoWatchList(d['id']))}
-                >
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
-                    {d['id']}
-                  </td>
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
-                    {d["keywords"]}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+          {isMultiJ ? (
+            <tbody className="bg-white divide-y divide-gray-200">
+              {data.map(function (d, index) {
+                return (
+                  <tr
+                    key={index}
+                    onClick={() => dispatch(addtoWatchListoj(d["id"]))}
+                  >
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
+                      {d["id"]}
+                    </td>
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
+                      {d["keywords"]}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          ) : (
+            <tbody className="bg-white divide-y divide-gray-200">
+              {data.map(function (d, index) {
+                return (
+                  <tr
+                    key={index}
+                    onClick={() => dispatch(addtoWatchList(d["id"]))}
+                  >
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
+                      {d["id"]}
+                    </td>
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
+                      {d["keywords"]}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          )}
         </table>
       </div>
     </div>
@@ -58,3 +86,4 @@ function SortableTable(props) {
 }
 
 export default FetchedJDisplay;
+export { FetchedJDisplayOJ };

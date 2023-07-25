@@ -7,7 +7,7 @@ function Jelly() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('http://127.0.0.1:5005/')
+    fetch('http://127.0.0.1:5005/test')
       .then(response => {
         if (response.status === 200) {
           return response.json();
@@ -26,7 +26,7 @@ function Jelly() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-5">
+    <div className="max-w-10xl mx-auto px-5">
         <div className ="font-bold text-3xl">
         Jelly
         </div>

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { BeatLoader } from "react-spinners";
 
 function ActiveISummary() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState([])
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const handleCopyToLocal = (files) => {
-    setSelectedFiles(files)
+  const handleSelectedFiles = (files) => {
+    setSelectedFiles(files);
   };
 
   async function fetchActiveISum() {
@@ -20,7 +23,12 @@ function ActiveISummary() {
         }
       })
       .then((data) => {
-        setData(data);
+        // console.log(data)
+        if (data.n === 0) {
+          setData([])
+        }else {
+          setData(data.data);
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -30,34 +38,134 @@ function ActiveISummary() {
   }
 
   useEffect(() => {
-    fetchActiveISum()
+    fetchActiveISum();
   }, []);
+
+  // async function copyToLocal(event) {
+  //   event.preventDefault();
+  //   fetch("http://127.0.0.1:5005/copy_isum_to_local/", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(
+  //       selectedFiles.map((d, index) => {
+  //         return { name: data[d].name };
+  //       })
+  //     ),
+  //   })
+  //     .then((data) => {
+  //       // console.log(data);
+  //       toast.success("Copy to Local Successfully!");
+  //     })
+  //     .catch((error) => {
+  //       toast.error("Copy to Local Failed");
+  //     });
+  // }
+
+  // async function copyToLocal(event) {
+  //   event.preventDefault();
+  //   const response = await toast.promise(
+  //     fetch("http://127.0.0.1:5005/copy_isum_to_local/", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(
+  //         selectedFiles.map((d, index) => {
+  //           return { name: data[d].name };
+  //         })
+  //       ),
+  //     }).then((response) => {
+  //       if (response.status === 200) {
+  //         return response.json();
+  //       } else {
+  //         throw new Error("Failed to fetch data");
+  //       }
+  //     }),
+  //     {
+  //       pending: 'Start copying',
+  //       success: 'Copy to Local Successfully! 👌',
+  //       error: 'Copy to Local Failed 🤯'
+  //     }
+  //   );
+  //   console.log(response)
+  // }
 
   async function copyToLocal(event) {
     event.preventDefault();
-    console.log ( JSON.stringify(selectedFiles ))
-    const response = await fetch("http://127.0.0.1:5005/copy_isum_to_local/", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(selectedFiles )
-    });
-    const json = await response.json();
-    console.log(json);
-  }
+    console.log(selectedFiles)
+    const id = toast.loading("Start copying")
+    if (selectedFiles.length === 0){
+      toast.update(id, { render:"No file selected", type: "error", isLoading: false, autoClose: 5000})
+      return 
+    } else {
+      fetch("http://127.0.0.1:5005/copy_isum_to_local/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          selectedFiles.map((d, index) => {
+            return { name: data[d].name };
+          })
+        ),
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          toast.error("Copy to Local Failed");
+          throw new Error("Failed to fetch data");
+        }
+      })
+      .then((data)=> {
+        toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
+        console.log(data)
+      })
 
+    }
+
+  }
 
   return (
     <>
-      <div>ActiveISummary</div>
+      <ToastContainer position="bottom-right" />
+      <div className ="font-bold text-xl">ActiveISummary</div>
+
       {/* Filter */}
-      <div className ="p-2">{data && !loading ? <ActiveISumTable data={data} handleCopyToLocal={handleCopyToLocal} /> : <button className="btn loading">loading</button>}</div>
-      <div className ="p-2 flex flex-col  justify-between gap-2">
-        <button className="btn" onClick = {copyToLocal} >Copy to local</button>
-        <button className="btn" > Open Selected Files</button> 
-        <button className="btn" onClick = {fetchActiveISum}> Refresh</button> 
+      <div className="p-2">
+        {data && !loading ? (
+          <>
+            <ActiveISumTable
+              data={data}
+              handleSelectedFiles={handleSelectedFiles}
+            />
+            <div className="p-2 text-right">Total {data.length} iSummary</div>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <BeatLoader color="#3298e2" />
+          </div>
+        )}
       </div>
+
+      {/* <>
+        <DirectorySelector />
+      </> */}
+
+      {/* <div className="p-2 flex flex-col  justify-between gap-2"> */}
+      <div className="flex w-full justify-between" >
+        <button className="btn" onClick={copyToLocal}>
+          Copy to local
+        </button>
+        <button className="btn"> Open Selected Files</button>
+        <button className="btn" onClick={fetchActiveISum}>
+          {" "}
+          Refresh
+        </button>
+      </div>
+
     </>
   );
 }
@@ -65,22 +173,38 @@ function ActiveISummary() {
 export default ActiveISummary;
 
 function ActiveISumTable(props) {
-  const { data, handleCopyToLocal } = props;
+  const { data, handleSelectedFiles } = props;
   const [selectedRows, setSelectedRows] = useState([]);
+  const [checkAll, setCheckAll] = useState(false);
   const handleRowClick = (e) => {
     let row = e.target.value;
     const selectedIndex = selectedRows.indexOf(row);
     if (selectedIndex === -1) {
       // If not, add the row to the selectedRows array
       setSelectedRows([...selectedRows, row]);
+      handleSelectedFiles([...selectedRows, row]);
     } else {
       // If yes, remove the row from the selectedRows array
       const newSelectedRows = [...selectedRows];
       newSelectedRows.splice(selectedIndex, 1);
       setSelectedRows(newSelectedRows);
+      handleSelectedFiles(newSelectedRows);
     }
-    handleCopyToLocal(selectedRows)
   };
+
+  const handleCheckAll = () => {
+    // console.log("first");
+    setCheckAll(!checkAll);
+    if (!checkAll) {
+      setSelectedRows(data.map((d, index) => index.toString()));
+      handleSelectedFiles(data.map((d, index) => index.toString()));
+    } else {
+      setSelectedRows([]);
+      handleSelectedFiles([]);
+    }
+    // setTableData(tableData.map(item => ({ ...item, isChecked: !isChecked })));
+  };
+  // console.log(selectedRows);
 
   const isRowSelected = (rowIndex) => {
     // Check if the index is in the selectedRows array
@@ -95,7 +219,12 @@ function ActiveISumTable(props) {
           <tr>
             <th>
               <label>
-                <input type="checkbox" className="checkbox" />
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={checkAll}
+                  onChange={handleCheckAll}
+                />
               </label>
             </th>
             <th>name</th>
@@ -125,6 +254,29 @@ function ActiveISumTable(props) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function DirectorySelector() {
+  const [directoryPath, setDirectoryPath] = useState("");
+
+  const handleSelectDirectory = (event) => {
+    const directoryPath = event.target.files[0].path;
+    setDirectoryPath(directoryPath);
+  };
+
+  return (
+    <div>
+      <label htmlFor="directory-selector">Select Directory:</label>
+      <input
+        id="directory-selector"
+        type="file"
+        directory
+        webkitdirectory
+        onChange={handleSelectDirectory}
+      />
+      {directoryPath && <p>Selected Directory: {directoryPath}</p>}
     </div>
   );
 }
