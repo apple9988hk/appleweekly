@@ -63,7 +63,7 @@ function FetchOJ() {
       if (d.trim().length !== 10) {
         console.log("Invalid Id");
       } else {
-        dispatch(fetchOJData(fetchId));
+        dispatch(fetchOJData(d.trim()));
       }
     });
   };
