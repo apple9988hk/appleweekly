@@ -3,10 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import _ from "lodash";
 import ReactEcharts from "echarts-for-react";
 
-function LEPLotChart() {
+function LEPLotChart(props) {
   const jdataset = useSelector((state) => state.jdata.data);
   const idList = useSelector((state) => state.jdata.idList);
   const watchList = useSelector((state) => state.jdata.watchList);
+  const [colorSetting, setColorSetting] = useState([]);
   const dataToShow = [
     "SampleID",
     "Wvl_nm",
@@ -19,6 +20,12 @@ function LEPLotChart() {
     "CdA",
     "LmW",
   ];
+  const handleInputChange = (e) => {
+    const colorsArray = e.target.value
+      .split("")
+      .map((color) => parseInt(color));
+    setColorSetting(colorsArray);
+  };
   return (
     <div>
       <>
@@ -26,10 +33,27 @@ function LEPLotChart() {
           return <div key={index}> {item} </div>;
         })}
       </>
-      <LEChart data={jdataset} idList={idList} cd={10} />
+
+      <div className="form-control pr-2 w-full py-5">
+        <input
+          type="text"
+          placeholder="Input color Setting"
+          className="input input-bordered input-sm w-full max-w-2xl"
+          onChange={(e) => handleInputChange(e)}
+        />
+        <span className="label-text-alt px-1">Ex: 111222333 </span>
+      </div>
+
+      <LEChart
+        data={jdataset}
+        idList={idList}
+        cd={10}
+        colorSetting={colorSetting}
+      />
       <>
         {watchList.length > 0 ? (
-          <JTableSingleTable dataToShow = {dataToShow}
+          <JTableSingleTable
+            dataToShow={dataToShow}
             data={_.filter(jdataset, function (o) {
               return (
                 o.SampleID.slice(0, 10) === watchList[watchList.length - 1]
@@ -46,13 +70,14 @@ function LEPLotChartOJ() {
   const ojdataset = useSelector((state) => state.ojdata.data);
   const idList = useSelector((state) => state.ojdata.idList);
   const watchList = useSelector((state) => state.ojdata.watchList);
-  const dataToShow = [
-    "Title",
-    "CIE_X",
-    "CIE_Y",
-    "Luminance",
-    "LE"
-  ];
+  const [colorSetting, setColorSetting] = useState([]);
+  const dataToShow = ["Title", "CIE_X", "CIE_Y", "Luminance", "LE"];
+  const handleInputChange = (e) => {
+    const colorsArray = e.target.value
+      .split("")
+      .map((color) => parseInt(color));
+    setColorSetting(colorsArray);
+  };
   return (
     <div>
       <>
@@ -60,14 +85,31 @@ function LEPLotChartOJ() {
           return <div key={index}> {item} </div>;
         })}
       </>
-      <LEChart data={ojdataset} idList={idList} cd={15} />
+
+      <div className="form-control pr-2 w-full py-5">
+        <input
+          type="text"
+          placeholder="Input color Setting"
+          className="input input-bordered input-sm w-full max-w-2xl"
+          onChange={(e) => handleInputChange(e)}
+        />
+        <span className="label-text-alt px-1">Ex: 111222333 </span>
+      </div>
+
+      <LEChart
+        data={ojdataset}
+        idList={idList}
+        cd={15}
+        colorSetting={colorSetting}
+      />
       <>
         {watchList.length > 0 ? (
           <JTableSingleTable
-            dataToShow = {dataToShow}
+            dataToShow={dataToShow}
             data={_.filter(ojdataset, function (o) {
               return (
-                o.Title.slice(0, 10) === watchList[watchList.length - 1] && o.CurrentDensity === 15
+                o.Title.slice(0, 10) === watchList[watchList.length - 1] &&
+                o.CurrentDensity === 15
               );
             })}
           />
@@ -78,14 +120,26 @@ function LEPLotChartOJ() {
 }
 
 function LEChart(props) {
-  const { data, idList, cd } = props;
+  const { data, idList, cd, colorSetting } = props;
   let newSeries = [];
+  let isColorSetting = colorSetting !== undefined ? true : false;
+  const colorOption = [
+    "#5470c6",
+    "#91cc75",
+    "#fac858",
+    "#ee6666",
+    "#73c0de",
+    "#3ba272",
+    "#fc8452",
+    "#9a60b4",
+    "#ea7ccc",
+  ];
   if (cd === 10) {
-    idList.forEach(function (id) {
+    idList.forEach(function (id, index) {
       let filtered = _.filter(data, function (o) {
         return o.SampleID.slice(0, 10) === id.id;
       });
-      newSeries.push({
+      const seriesConfig = {
         name: id.id,
         type: "scatter",
         emphasis: {
@@ -98,14 +152,18 @@ function LEChart(props) {
           d.SampleID,
           Number(d.SampleID.slice(11, 12)),
         ]),
-      });
+      };
+      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
+        seriesConfig.color = colorOption[colorSetting[index]-1];
+      }
+      newSeries.push(seriesConfig);
     });
   } else {
-    idList.forEach(function (id) {
+    idList.forEach(function (id, index) {
       let filtered = _.filter(data, function (o) {
         return o.Title.slice(0, 10) === id.id && o.CurrentDensity === 15;
       });
-      newSeries.push({
+      const seriesConfig = {
         name: id.id,
         type: "scatter",
         emphasis: {
@@ -118,7 +176,11 @@ function LEChart(props) {
           d.Title,
           Number(d.Title.slice(11, 12)),
         ]),
-      });
+      };
+      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
+        seriesConfig.color = colorOption[colorSetting[index]-1];
+      }
+      newSeries.push(seriesConfig);
     });
   }
   const option = {
@@ -158,6 +220,7 @@ function LEChart(props) {
         brush: {
           type: ["rect", "polygon", "clear"],
         },
+        saveAsImage: {},
       },
     },
     brush: {},
@@ -173,6 +236,8 @@ function LEChart(props) {
         scale: true,
         axisLabel: {
           formatter: "{value}",
+          showMinLabel: false,
+          showMaxLabel: false
         },
         nameLocation: "middle",
         nameGap: 30,
@@ -201,6 +266,7 @@ function LEChart(props) {
         max: 9,
         inRange: {
           symbol: ["circle", "square", "triangle"],
+          symbolSize: [8],
         },
         formatter: function (value, value2) {
           return "c" + Math.ceil(value) + "- c" + Math.floor(value2);

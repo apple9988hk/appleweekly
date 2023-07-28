@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchJData } from "../../../features/jdata/jdataSlice";
 import { fetchOJData } from "../../../features/ojdata/ojdataSlice";
 
-
 export default function FetchJ() {
   // const jdataset = useSelector((state) => selectRSById(state, stockId));
   const jdataStatus = useSelector((state) => state.jdata.status);
@@ -14,7 +13,7 @@ export default function FetchJ() {
   const addJData = () => {
     let idList = fetchId.split(",");
     idList.forEach((d) => {
-      console.log(d)
+      console.log(d);
       if (d.trim().length !== 10) {
         console.log("Invalid Id");
       } else {
@@ -33,7 +32,9 @@ export default function FetchJ() {
             className="input input-bordered input-sm w-full max-w-2xl"
             onChange={(e) => setFetchId(e.target.value)}
           />
-      <span className="label-text-alt px-1">Ex: H-041123-1,H-041123-2,H-041123-3 </span>
+          <span className="label-text-alt px-1">
+            Ex: H-041123-1,H-041123-2,H-041123-3{" "}
+          </span>
         </div>
         <button
           className={`btn btn-outline btn-sm ${
@@ -59,7 +60,7 @@ function FetchOJ() {
   const addJData = () => {
     let idList = fetchId.split(",");
     idList.forEach((d) => {
-      console.log(d)
+      console.log(d);
       if (d.trim().length !== 10) {
         console.log("Invalid Id");
       } else {
@@ -78,7 +79,9 @@ function FetchOJ() {
             className="input input-bordered input-sm w-full max-w-2xl"
             onChange={(e) => setFetchId(e.target.value)}
           />
-      <span className="label-text-alt px-1">Ex: H-072523-Y,H-072623-X </span>
+          <span className="label-text-alt px-1">
+            Ex: H-072523-Y,H-072623-X{" "}
+          </span>
         </div>
         <button
           className={`btn btn-outline btn-sm ${
@@ -94,5 +97,4 @@ function FetchOJ() {
   );
 }
 
-export {FetchOJ}
-
+export { FetchOJ };
