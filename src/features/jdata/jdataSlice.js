@@ -30,12 +30,15 @@ export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
             o.Filename === d.SampleID
           );
         })
-      console.log(e)
+      // console.log(e)
+      // console.log(d)
+      // console.log(d.CdA/ e[0].Cie_y)
       return (
         {
           ...d,
-          ...e[0]
-    }
+          ...e[0],
+          BI: d.CdA/ e[0].Cie_y
+        }
       )
     }
   )

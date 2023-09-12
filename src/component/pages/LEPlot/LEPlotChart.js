@@ -19,6 +19,7 @@ function LEPLotChart(props) {
     "Qe",
     "CdA",
     "LmW",
+    "BI"
   ];
   const handleInputChange = (e) => {
     const colorsArray = e.target.value
@@ -50,6 +51,13 @@ function LEPLotChart(props) {
         cd={10}
         colorSetting={colorSetting}
       />
+      
+      <BIChart
+        data={jdataset}
+        idList={idList}
+        cd={10}
+        colorSetting={colorSetting}
+      />
       <>
         {watchList.length > 0 ? (
           <JTableSingleTable
@@ -71,7 +79,7 @@ function LEPLotChartOJ() {
   const idList = useSelector((state) => state.ojdata.idList);
   const watchList = useSelector((state) => state.ojdata.watchList);
   const [colorSetting, setColorSetting] = useState([]);
-  const dataToShow = ["Title", "CIE_X", "CIE_Y", "Luminance", "LE"];
+  const dataToShow = ["Title", "CIE_X", "CIE_Y", "Luminance", "LE", "BI"];
   const handleInputChange = (e) => {
     const colorsArray = e.target.value
       .split("")
@@ -102,6 +110,12 @@ function LEPLotChartOJ() {
         cd={15}
         colorSetting={colorSetting}
       />
+      <BIChart
+        data={ojdataset}
+        idList={idList}
+        cd={15}
+        colorSetting={colorSetting}
+      />
       <>
         {watchList.length > 0 ? (
           <JTableSingleTable
@@ -120,7 +134,7 @@ function LEPLotChartOJ() {
 }
 
 function LEChart(props) {
-  const { data, idList, cd, colorSetting } = props;
+  const { data, idList, cd, colorSetting} = props;
   let newSeries = [];
   let isColorSetting = colorSetting !== undefined ? true : false;
   const colorOption = [
@@ -247,6 +261,178 @@ function LEChart(props) {
       {
         type: "value",
         name: `LE @${cd}J [cd/A]`,
+        scale: true,
+        axisLabel: {
+          formatter: "{value}",
+        },
+        nameLocation: "middle",
+        nameGap: 40,
+      },
+    ],
+    series: newSeries,
+    visualMap: [
+      {
+        left: 10,
+        type: "piecewise",
+        splitNumber: 3,
+        dimension: 3,
+        min: 1,
+        max: 9,
+        inRange: {
+          symbol: ["circle", "square", "triangle"],
+          symbolSize: [8],
+        },
+        formatter: function (value, value2) {
+          return "c" + Math.ceil(value) + "- c" + Math.floor(value2);
+        },
+        itemHeight: 8,
+        itemWidth: 9,
+        textStyle: {
+          fontSize: 9,
+        },
+      },
+    ],
+  };
+  return (
+    <div className="pb-10">
+      <ReactEcharts
+        option={option}
+        notMerge={true}
+        style={{ height: "500px", width: "100%" }}
+      />
+    </div>
+  );
+}
+
+function BIChart(props) {
+  const { data, idList, cd, colorSetting} = props;
+  let newSeries = [];
+  let isColorSetting = colorSetting !== undefined ? true : false;
+  const colorOption = [
+    "#5470c6",
+    "#91cc75",
+    "#fac858",
+    "#ee6666",
+    "#73c0de",
+    "#3ba272",
+    "#fc8452",
+    "#9a60b4",
+    "#ea7ccc",
+  ];
+  if (cd === 10) {
+    idList.forEach(function (id, index) {
+      let filtered = _.filter(data, function (o) {
+        return o.SampleID.slice(0, 10) === id.id;
+      });
+      const seriesConfig = {
+        name: id.id,
+        type: "scatter",
+        emphasis: {
+          focus: "series",
+        },
+        symbolSize: 5,
+        data: filtered.map((d) => [
+          d.Cie_y,
+          d.BI,
+          d.SampleID,
+          Number(d.SampleID.slice(11, 12)),
+        ]),
+      };
+      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
+        seriesConfig.color = colorOption[colorSetting[index]-1];
+      }
+      newSeries.push(seriesConfig);
+    });
+  } else {
+    idList.forEach(function (id, index) {
+      let filtered = _.filter(data, function (o) {
+        return o.Title.slice(0, 10) === id.id && o.CurrentDensity === 15;
+      });
+      console.log(filtered)
+      const seriesConfig = {
+        name: id.id,
+        type: "scatter",
+        emphasis: {
+          focus: "series",
+        },
+        symbolSize: 5,
+        data: filtered.map((d) => [
+          d.CIE_Y,
+          d.BI,
+          d.Title,
+          Number(d.Title.slice(11, 12)),
+        ]),
+      };
+      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
+        seriesConfig.color = colorOption[colorSetting[index]-1];
+      }
+      newSeries.push(seriesConfig);
+    });
+  }
+  const option = {
+    title: {
+      text: "BI vs CIE_Y",
+    },
+    grid: {
+      left: "3%",
+      right: "7%",
+      bottom: "12.5%",
+      containLabel: true,
+    },
+    tooltip: {
+      formatter: function (params) {
+        return (
+          params.value[2] +
+          " :<br/>" +
+          "CIE_Y: " +
+          parseFloat(params.value[1]).toFixed(3) +
+          " " +
+          "BI: " +
+          parseFloat(params.value[0]).toFixed(3)
+        );
+      },
+      axisPointer: {
+        show: true,
+        type: "cross",
+        lineStyle: {
+          type: "dashed",
+          width: 1,
+        },
+      },
+    },
+    toolbox: {
+      feature: {
+        dataZoom: {},
+        brush: {
+          type: ["rect", "polygon", "clear"],
+        },
+        saveAsImage: {},
+      },
+    },
+    brush: {},
+    legend: {
+      data: idList.map((id) => id.id),
+      left: "center",
+      bottom: 10,
+    },
+    xAxis: [
+      {
+        type: "value",
+        name: "CIE_Y",
+        scale: true,
+        axisLabel: {
+          formatter: "{value}",
+          showMinLabel: false,
+          showMaxLabel: false
+        },
+        nameLocation: "middle",
+        nameGap: 30,
+      },
+    ],
+    yAxis: [
+      {
+        type: "value",
+        name: `BI @${cd}J [cd/A]`,
         scale: true,
         axisLabel: {
           formatter: "{value}",

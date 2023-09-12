@@ -20,13 +20,16 @@ export const fetchOJData = createAsyncThunk("users/fetchOJData", async (id) => {
   if (snapshot.status === 200) {
     newdata = snapshot.data;
     console.log(newdata);
+    console.log("first")
   }
   newdata = newdata.map((d) => {
     return {
       ...d,
       LE: (d.Luminance / d.CurrentDensity) * 0.1,
+      BI: (d.Luminance / d.CurrentDensity) * 0.1 /d.CIE_Y
     };
   });
+
 
   return newdata;
 });

@@ -93,7 +93,7 @@ function ParkingTable(props) {
           <tbody>
             {sorted.map((d, index) => (
               <tr>
-                <td>{d.Title}{d.fav ? <StarIcon className="h-5 w-5"/> : <></>}</td>
+                <td><div className="w-64 truncate">{d.Title}</div>{d.fav ? <StarIcon className="h-5 w-5"/> : <></>}</td>
                 <td>{d.TotalNumberOfCharger}</td>
                 <td>{d.TotalNumberOfAvailableQuickCharger}/ {d.TotalNumberOfQuickCharger}</td>
                 <td>{d.TotalNumberOfAvailableSemiQuickCharger}/ {d.TotalNumberOfSemiQuickCharger}</td>
