@@ -53,6 +53,8 @@ export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
 });
 
 
+// http://tmdata.udc.local/api/jvl/forward/H-091523aB
+
 export const fetchSpectral = createAsyncThunk("users/fetchSpectral", async (id) => {
   let newdata = {};
   const snapshot = await axios.get(`http://tmdata.udc.local/api/spectral/${id}`);
