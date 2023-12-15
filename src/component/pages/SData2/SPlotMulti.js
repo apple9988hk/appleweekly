@@ -2,25 +2,26 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import _ from "lodash";
 import ReactEcharts from "echarts-for-react";
-import { addtoSinglePlotCouponList } from "../../../features/sdata/sdataSlice";
+import { addtoMultiPlotCouponList } from "../../../features/sdata/sdataSlice";
 
-function SPlotSingle() {
+function SPlotMulti() {
   const sdataset = useSelector((state) => state.sdata.data);
-  const idList = useSelector((state) => state.sdata.idList);
-  const watchList = useSelector((state) => state.sdata.watchList);
-  const plotList = useSelector((state) => state.sdata.singlePlotCouponList);
+  // const idList = useSelector((state) => state.sdata.idList);
+  // const watchList = useSelector((state) => state.sdata.watchList);
+  const plotList = useSelector((state) => state.sdata.multiPlotCouponList);
   const dispatch = useDispatch();
-  const plotId = watchList.slice(-1)[0];
-  const dataToPlot = _.filter(sdataset, function (o) {
-    return o.Title.slice(0, 10) === plotId;
-  });
+  // const plotId = watchList.slice(-1)[0];
+  // const dataToPlot = _.filter(sdataset, function (o) {
+  //   return o.Title.slice(0, 10) === plotId;
+  // });
 
   return (
     <div>
       {" "}
-      {watchList.length > 0 ? (
+      {sdataset.length > 0 ? (
+        // <>hi</>
         <PlotContainer
-          data={dataToPlot}
+          data={sdataset}
           dispatch={dispatch}
           plotList={plotList}
         />
@@ -29,18 +30,19 @@ function SPlotSingle() {
   );
 }
 
-export default SPlotSingle;
+export default SPlotMulti;
 
 function PlotContainer(props) {
   const { data, dispatch, plotList } = props;
-
-  // console.log("PlotList");
-  // console.log(plotList)
+  console.log(plotList)
+  console.log("plotList")
 
   let filtered = _.filter(data, function (o) {
-    return plotList.includes(o.Title.slice(-3));
+    return plotList.includes(o.Title);
   });
 
+//   console.log(filtered);
+//   console.log("filtered");
   return (
     <div className="py-2">
       <STable data={data} dispatch={dispatch} plotList={plotList} />
@@ -168,7 +170,7 @@ function STable(props) {
   // const [plotList, setPlotList] = useState(unique.map((d) => d + "d4"));
   // console.log(watchList)
   function toggleDot(dot) {
-    dispatch(addtoSinglePlotCouponList(dot));
+    dispatch(addtoMultiPlotCouponList(dot));
   }
   // console.log(plotList);
   return (
@@ -193,7 +195,7 @@ function STable(props) {
                 </td>
 
                 {["1", "2", "3", "4"].map(function (e) {
-                  let isChecked = plotList.includes(d.slice(-1) + "d" + e);
+                  let isChecked = plotList.includes(d + "d" + e);
                   return (
                     <td>
                       <div>
@@ -201,7 +203,7 @@ function STable(props) {
                           type="checkbox"
                           className="toggle w-4 h-4"
                           defaultChecked={isChecked}
-                          onClick={() => toggleDot(d.slice(-1) + "d" + e)}
+                          onClick={() => toggleDot(d + "d" + e)}
                         />
                       </div>
                     </td>

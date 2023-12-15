@@ -4,6 +4,7 @@ import WeeklyReport from "./component/pages/WeeklyReport";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import JTable from "./component/pages/JTable/JTable";
 import SData from "./component/pages/SData/SData";
+import SData2 from "./component/pages/SData2/SData";
 import CPPPlot from "./component/charts/CPPPlot";
 import JImage from "./component/pages/JImage/JImage"
 import Exp from "./component/pages/Exp/Exp"
@@ -116,6 +117,15 @@ const MainView = () => {
           {" "}
           LE Plot
         </div>
+        <div
+          className={
+            "tab tab-lg tab-bordered " + (activeTab === 4 ? "tab-active" : null)
+          }
+          onClick={() => setActiveTab(4)}
+        >
+          {" "}
+          SData2
+        </div>
       </div>
       {activeTab === 0 ? (
         <div>
@@ -133,6 +143,7 @@ const MainView = () => {
       {activeTab === 1 ? <div> <JImage/> </div> : null}
       {activeTab === 2 ? <div> <SData/> </div> : null}
       {activeTab === 3 ? <div> <LEPlot/> </div> : null}
+      {activeTab === 4 ? <div> <SData2/> </div> : null}
     </div>
   );
 }

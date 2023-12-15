@@ -9,7 +9,8 @@ const initialState = {
   status: "idle",
   error: null,
   watchList: [],
-  singlePlotCouponList:[]
+  singlePlotCouponList:[],
+  multiPlotCouponList:[]
 };
 
 export const fetchSData = createAsyncThunk("users/fetchSData", async (id) => {
@@ -63,6 +64,15 @@ export const sdataSlice = createSlice({
         state.singlePlotCouponList.push(action.payload)
       }
     },
+    addtoMultiPlotCouponList: (state, action) =>{
+      const index = state.multiPlotCouponList.indexOf(action.payload);
+      if (index > -1) { // only splice array when item is found
+          state.multiPlotCouponList.splice(index, 1); // 2nd parameter means remove one item only
+          console.log('item removed')
+      } else {
+        state.multiPlotCouponList.push(action.payload)
+      }
+    },
     //   console.log("addtoSinglePlotCouponList")
     //   console.log(action.payload)
     //   state.singlePlotCouponList.push(action.payload)
@@ -92,5 +102,5 @@ export const sdataSlice = createSlice({
   },
 });
 
-export const { toIdle, addtoWatchList, addtoSinglePlotCouponList } = sdataSlice.actions;
+export const { toIdle, addtoWatchList, addtoSinglePlotCouponList, addtoMultiPlotCouponList} = sdataSlice.actions;
 export default sdataSlice.reducer;

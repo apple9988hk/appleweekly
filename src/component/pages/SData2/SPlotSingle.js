@@ -71,7 +71,8 @@ function SingleLinePlot(props) {
       itemSize: 25,
       top: 30,
       feature: {
-        dataZoom: {},
+        dataZoom: {
+        },
       },
     },
     dataZoom: [
@@ -96,7 +97,8 @@ function SingleLinePlot(props) {
         type: "line",
       };
     }),
-  };
+
+  }
   const option_normalized = {
     xAxis: {
       min: 380,
@@ -117,7 +119,8 @@ function SingleLinePlot(props) {
       itemSize: 25,
       top: 30,
       feature: {
-        dataZoom: {},
+        dataZoom: {
+        },
       },
     },
     dataZoom: [
@@ -133,28 +136,29 @@ function SingleLinePlot(props) {
       height: 350,
     },
     series: filtered.map(function (d) {
-      let max = _.maxBy(d.SpectralDetail, "RadianceData");
+      let max = _.maxBy(d.SpectralDetail, "RadianceData")
       return {
         name: d.Title,
         data: d.SpectralDetail.map(function (d) {
-          return [d.Wavelength, d.RadianceData / max.RadianceData];
+          return [d.Wavelength, d.RadianceData/max.RadianceData];
         }),
         showSymbol: false,
         type: "line",
       };
     }),
-  };
+
+  }
   return (
     <div>
       <ReactEcharts
         option={option}
-        notMerge={true}
+        notMerge ={true}
         style={{ height: "500px", width: "100%" }}
       />
       <div className="font-bold"> Normalized </div>
       <ReactEcharts
         option={option_normalized}
-        notMerge={true}
+        notMerge ={true}
         style={{ height: "500px", width: "100%" }}
       />
     </div>
@@ -201,7 +205,7 @@ function STable(props) {
                           type="checkbox"
                           className="toggle w-4 h-4"
                           defaultChecked={isChecked}
-                          onClick={() => toggleDot(d.slice(-1) + "d" + e)}
+                          onClick={() => toggleDot(d.slice(-1)+ "d" + e)}
                         />
                       </div>
                     </td>
