@@ -19,6 +19,7 @@ import Flashcard from "./component/pages/Test/Flashcard"
 import Parking from "./component/pages/Parking/Parking"
 import Short from "./component/pages/Short/Short2"
 import OJData from "./component/pages/OJData/OJData"
+import JVLData  from "./component/pages/JVLData/JVLData.js";
 
 
 const initialState = {
@@ -126,6 +127,15 @@ const MainView = () => {
           {" "}
           SData2
         </div>
+        <div
+          className={
+            "tab tab-lg tab-bordered " + (activeTab === 5 ? "tab-active" : null)
+          }
+          onClick={() => setActiveTab(5)}
+        >
+          {" "}
+          JVLData
+        </div>
       </div>
       {activeTab === 0 ? (
         <div>
@@ -144,6 +154,7 @@ const MainView = () => {
       {activeTab === 2 ? <div> <SData/> </div> : null}
       {activeTab === 3 ? <div> <LEPlot/> </div> : null}
       {activeTab === 4 ? <div> <SData2/> </div> : null}
+      {activeTab === 5 ? <div> <JVLData/> </div> : null}
     </div>
   );
 }
@@ -168,6 +179,7 @@ const App = () => {
         <Route path="parking" element={<Parking/>} />
         <Route path="Short" element={<Short/>} />
         <Route path="ojdata" element={<OJData/>} />
+        <Route path="jvldata" element={<JVLData/>} />
 
       </Routes>
     </BrowserRouter>
