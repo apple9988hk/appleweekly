@@ -29,13 +29,13 @@ function JVLFNitTable() {
           />
         </div>
       </div>
-      {inputNit ? (
+      {inputNit && !isNaN(inputNit)? (
         <CDatNit
           nit={inputNit}
           data={jvldata}
           runID={watchList[watchList.length - 1]}
         />
-      ) : null}
+      ) : <h2> Input Nit to calculate LT CD</h2>}
     </div>
   );
 }
@@ -65,6 +65,7 @@ function findClosestValuesInObjects(arrOfObjects, target, propertyName) {
 
 function CDatNit(props) {
   const { nit, data, runID } = props;
+
   // console.log("input");
   // console.log(data);
   //   console.log(data);
