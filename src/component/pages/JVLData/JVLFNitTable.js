@@ -16,6 +16,7 @@ function JVLFNitTable() {
     return o.SampleID.slice(0, 10) === watchList[watchList.length - 1];
   });
   const [inputNit, setInputNit] = useState("");
+  console.log(jvldata.length > 0)
 
   return (
     <div>
@@ -29,7 +30,7 @@ function JVLFNitTable() {
           />
         </div>
       </div>
-      {inputNit && !isNaN(inputNit)? (
+      {inputNit && !isNaN(inputNit) && jvldata.length > 0 ? (
         <CDatNit
           nit={inputNit}
           data={jvldata}
