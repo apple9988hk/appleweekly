@@ -71,28 +71,33 @@ function CDatNit(props) {
   // console.log(data);
   //   console.log(data);
   const newdata = data.map(function (d) {
-    // console.log(d)
-    let a = _.findLast(d.JVLForwardDetail, function (n) {
-      return n["Luminance"] <= nit;
-    });
-    let b = _.find(d.JVLForwardDetail, function (n) {
-      return n["Luminance"] > nit;
-    });
+    console.log(d)
+    try {
+      let a = _.findLast(d.JVLForwardDetail, function (n) {
+        return n["Luminance"] <= nit;
+      });
+      let b = _.find(d.JVLForwardDetail, function (n) {
+        return n["Luminance"] > nit;
+      });
 
-    return {
-      SampleID: d.SampleID,
-      valueA: a,
-      valueB: b,
-      cd:
-        a.CurrentDensity +
-        (nit - a.Luminance) *
-          ((b.CurrentDensity - a.CurrentDensity) / (b.Luminance - a.Luminance)),
-      cie_x: d.Cie_x,
-      cie_y: d.Cie_y,
-    };
+      return {
+        SampleID: d.SampleID,
+        valueA: a,
+        valueB: b,
+        cd:
+          a.CurrentDensity +
+          (nit - a.Luminance) *
+            ((b.CurrentDensity - a.CurrentDensity) / (b.Luminance - a.Luminance)),
+        cie_x: d.Cie_x,
+        cie_y: d.Cie_y,
+      }; 
+    } catch (error) {
+      console.error("Error in mapping function:", error);
+    }
+
   });
 
-//   console.log(newdata);
+  console.log(newdata);
 
   return (
     <>
@@ -171,8 +176,20 @@ function JVLFData2(props) {
       : null;
     for (let j = 0; j < dotList.length; j++) {
       let d = dotList[j];
-      let cd = _.filter(data, { SampleID: runID + "-" + c + "d" + d })[0].cd;
-      buffer[`d${dotList[j]}`] = Math.round(cd * 1000) / 1000;
+      let matchingData = _.filter(data, { SampleID: runID + "-" + c + "d" + d });
+  
+      if (matchingData.length > 0) {
+        // Access the cd property if the dot exists
+        let cd = matchingData[0].cd;
+        buffer[`d${d}`] = Math.round(cd * 1000) / 1000;
+      } else {
+        // Handle the case where the dot does not exist
+        console.warn(`Dot ${d} not found in the data`);
+        // You may choose to set a default value or skip this iteration
+      }
+
+      // let cd = _.filter(data, { SampleID: runID + "-" + c + "d" + d })[0].cd;
+      // buffer[`d${dotList[j]}`] = Math.round(cd * 1000) / 1000;
     }
 
     let lt_cd = 0;
