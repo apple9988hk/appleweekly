@@ -3,7 +3,7 @@ import _ from "lodash";
 // const axios = require("axios");
 const API_URL = "https://jvldata.udc.local/getPlotData";
 // const https = require('https');
-const axios = require('axios')
+const axios = require("axios");
 // const https = require('https');
 
 const initialState = {
@@ -16,74 +16,71 @@ const initialState = {
 
 export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
   let newdata = {};
-  const snapshot = await axios.get(`http://tmdata.udc.local/api/spectral/log/${id}`);
-  const snapshot2 = await axios.get(`http://tmdata.udc.local/api/jvl/summary/${id}`);
-  const keyword = await axios.post(
-    "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id+"-1d1" }])
+  const snapshot = await axios.get(
+    `http://tmdata.udc.local/api/spectral/log/${id}`
   );
-  let merged = snapshot.data.map( 
-    function(d ) {
-      console.log(snapshot2.data)
-      console.log(d.SampleID)
-      let e = _.filter(snapshot2.data, function (o) {
-          return (
-            o.Filename === d.SampleID
-          );
-        })
-      // console.log(e)
-      // console.log(d)
-      // console.log(d.CdA/ e[0].Cie_y)
-      return (
-        {
-          ...d,
-          ...e[0],
-          BI: d.CdA/ e[0].Cie_y
-        }
-      )
-    }
-  )
+  const snapshot2 = await axios.get(
+    `http://tmdata.udc.local/api/jvl/summary/${id}`
+  );
+  const keyword = await axios.post(
+    "http://ltquickview/api/v1.0/data/keywords",
+    JSON.stringify([{ sampleID: id + "-1d1" }])
+  );
+  let merged = snapshot.data.map(function (d) {
+    console.log(snapshot2.data);
+    console.log(d.SampleID);
+    let e = _.filter(snapshot2.data, function (o) {
+      return o.Filename === d.SampleID;
+    });
+    // console.log(e)
+    // console.log(d)
+    // console.log(d.CdA/ e[0].Cie_y)
+    return {
+      ...d,
+      ...e[0],
+      BI: d.CdA / e[0].Cie_y,
+    };
+  });
   // console.log("merged")
   // console.log(merged)
-  
-  newdata['data'] = merged;
-  newdata['id'] = id;
-  newdata['keywords'] = keyword.data[0]['keywords'];
-  newdata['substrate'] = keyword.data[0]['substrate'];
+
+  newdata["data"] = merged;
+  newdata["id"] = id;
+  newdata["keywords"] = keyword.data[0]["keywords"];
+  newdata["substrate"] = keyword.data[0]["substrate"];
   return newdata;
 });
-
 
 // http://tmdata.udc.local/api/jvl/forward/H-091523aB
 
-export const fetchSpectral = createAsyncThunk("users/fetchSpectral", async (id) => {
-  let newdata = {};
-  const snapshot = await axios.get(`http://tmdata.udc.local/api/spectral/${id}`);
-  const keyword = await axios.post(
-    "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id+"-1d1" }])
-  );
-  let merged = snapshot.data.map( 
-    function( d ) {
-      console.log(snapshot.data)
-      console.log(d.SampleID)
-      return (
-        {
-          ...d,
+export const fetchSpectral = createAsyncThunk(
+  "users/fetchSpectral",
+  async (id) => {
+    let newdata = {};
+    const snapshot = await axios.get(
+      `http://tmdata.udc.local/api/spectral/${id}`
+    );
+    const keyword = await axios.post(
+      "http://ltquickview/api/v1.0/data/keywords",
+      JSON.stringify([{ sampleID: id + "-1d1" }])
+    );
+    let merged = snapshot.data.map(function (d) {
+      console.log(snapshot.data);
+      console.log(d.SampleID);
+      return {
+        ...d,
+      };
+    });
+    // console.log("merged")
+    // console.log(merged)
 
-    }
-      )
-    }
-  )
-  // console.log("merged")
-  // console.log(merged)
-  
-  newdata['data'] = merged;
-  newdata['id'] = id;
-  newdata['keywords'] = keyword.data[0]['keywords'];
-  newdata['substrate'] = keyword.data[0]['substrate'];
-  return newdata;
-});
-
-
+    newdata["data"] = merged;
+    newdata["id"] = id;
+    newdata["keywords"] = keyword.data[0]["keywords"];
+    newdata["substrate"] = keyword.data[0]["substrate"];
+    return newdata;
+  }
+);
 
 export const jdataSlice = createSlice({
   name: "jdata",
@@ -95,31 +92,51 @@ export const jdataSlice = createSlice({
     toIdle(state, action) {
       state.status = "idle";
     },
+    resetJData(state, action) {
+      // console.log(action)
+      // console.log("resetJ")
+      state.data = []
+      state.idList = []
+      state.status = "idle"
+      state.error = null
+      state.watchList = []
+    },
     addtoWatchList: (state, action) => {
-        const index = state.watchList.indexOf(action.payload);
-        if (index > -1) { // only splice array when item is found
-            state.watchList.splice(index, 1); // 2nd parameter means remove one item only
-        }
-        state.watchList.push(action.payload)
-      },
-    move_id_up: (state,action) => {
+      const index = state.watchList.indexOf(action.payload);
+      if (index > -1) {
+        // only splice array when item is found
+        state.watchList.splice(index, 1); // 2nd parameter means remove one item only
+      }
+      state.watchList.push(action.payload);
+    },
+    move_id_up: (state, action) => {
       const { payload: elementName } = action;
-      const index = state.idList.findIndex((element) => element.id === elementName);
+      const index = state.idList.findIndex(
+        (element) => element.id === elementName
+      );
 
       if (index > 0) {
         // Swap the element with the previous one
-        [state.idList[index - 1], state.idList[index]] = [state.idList[index], state.idList[index - 1]];
+        [state.idList[index - 1], state.idList[index]] = [
+          state.idList[index],
+          state.idList[index - 1],
+        ];
       }
     },
-    move_id_down: (state,action) => {
+    move_id_down: (state, action) => {
       const { payload: elementName } = action;
-      const index = state.idList.findIndex((element) => element.id === elementName);
+      const index = state.idList.findIndex(
+        (element) => element.id === elementName
+      );
 
       if (index < state.idList.length - 1) {
         // Swap the element with the previous one
-        [state.idList[index], state.idList[index + 1]] = [state.idList[index + 1], state.idList[index]];
+        [state.idList[index], state.idList[index + 1]] = [
+          state.idList[index + 1],
+          state.idList[index],
+        ];
       }
-    }
+    },
   },
   extraReducers: {
     [fetchJData.pending]: (state, action) => {
@@ -127,8 +144,8 @@ export const jdataSlice = createSlice({
     },
     [fetchJData.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      console.log(action.payload)
-      console.log("action.payload")
+      console.log(action.payload);
+      console.log("action.payload");
       // state.data = state.data.concat(action.payload.data)
       // state.idList.push({"id":action.payload.id, "keywords": action.payload.keywords})
 
@@ -146,7 +163,10 @@ export const jdataSlice = createSlice({
         state.data.push(newElement);
       });
 
-      const newId = {id: action.payload.id, keywords:action.payload.keywords}
+      const newId = {
+        id: action.payload.id,
+        keywords: action.payload.keywords,
+      };
 
       const existingElementIndex = state.idList.findIndex(
         (element) => element.id === newId.id
@@ -156,7 +176,6 @@ export const jdataSlice = createSlice({
       }
       // Append the newElement to state.data
       state.idList.push(newId);
-
     },
     [fetchJData.rejected]: (state, action) => {
       state.status = "failed";
@@ -181,5 +200,6 @@ export const jdataSlice = createSlice({
 // export const showJData = (state) => state.jdata.data;
 // export default jdataSlice.reducer;
 
-export const { toIdle, addtoWatchList, move_id_up, move_id_down } = jdataSlice.actions;
+export const { toIdle, addtoWatchList, move_id_up, move_id_down, resetJData } =
+  jdataSlice.actions;
 export default jdataSlice.reducer;

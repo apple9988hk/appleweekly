@@ -44,6 +44,15 @@ export const ojdataSlice = createSlice({
     toIdle(state, action) {
       state.status = "idle";
     },
+    resetJData(state, action) {
+      // console.log(action)
+      // console.log("resetJ")
+      state.data = []
+      state.idList = []
+      state.status = "idle"
+      state.error = null
+      state.watchList = []
+    },
     addtoWatchList: (state, action) => {
       const index = state.watchList.indexOf(action.payload);
       if (index > -1) {
@@ -129,5 +138,5 @@ export const ojdataSlice = createSlice({
   },
 });
 
-export const { toIdle, addtoWatchList, move_id_up, move_id_down } = ojdataSlice.actions;
+export const { toIdle, addtoWatchList, move_id_up, move_id_down, resetJData } = ojdataSlice.actions;
 export default ojdataSlice.reducer;

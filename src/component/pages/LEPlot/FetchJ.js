@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchJData } from "../../../features/jdata/jdataSlice";
-import { fetchOJData } from "../../../features/ojdata/ojdataSlice";
+import { fetchJData, resetJData } from "../../../features/jdata/jdataSlice";
+import { fetchOJData, resetJData as resetOJData  } from "../../../features/ojdata/ojdataSlice";
 
 export default function FetchJ() {
   // const jdataset = useSelector((state) => selectRSById(state, stockId));
@@ -22,9 +22,15 @@ export default function FetchJ() {
     });
   };
 
+  const handleResetJData = () => {
+    console.log("hi")
+    dispatch(resetJData())
+  }
+
+
   return (
     <div>
-      <div className="flex flex-row w-full max-w-lg py-5 items-start px-5">
+      <div className="flex flex-row w-full max-w-lg py-5 items-start px-5 space-x-2">
         <div className="form-control pr-2 w-full">
           <input
             type="text"
@@ -44,6 +50,13 @@ export default function FetchJ() {
         >
           {" "}
           Fetch{" "}
+        </button>
+        <button
+          className={`btn btn-outline btn-sm py pt-0`}
+          onClick={handleResetJData}
+        >
+          {" "}
+          Clear Data{" "}
         </button>
       </div>
     </div>
@@ -69,6 +82,11 @@ function FetchOJ() {
     });
   };
 
+  const handleResetJData = () => {
+    console.log("hi")
+    dispatch(resetOJData())
+  }
+
   return (
     <div>
       <div className="flex flex-row w-full max-w-lg py-5 items-start px-5">
@@ -91,6 +109,13 @@ function FetchOJ() {
         >
           {" "}
           Fetch{" "}
+        </button>
+        <button
+          className={`btn btn-outline btn-sm py pt-0`}
+          onClick={handleResetJData}
+        >
+          {" "}
+          Clear Data{" "}
         </button>
       </div>
     </div>
