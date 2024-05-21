@@ -34,15 +34,15 @@ export default SPlotMulti;
 
 function PlotContainer(props) {
   const { data, dispatch, plotList } = props;
-  console.log(plotList)
-  console.log("plotList")
+  console.log(plotList);
+  console.log("plotList");
 
   let filtered = _.filter(data, function (o) {
     return plotList.includes(o.Title);
   });
 
-//   console.log(filtered);
-//   console.log("filtered");
+  //   console.log(filtered);
+  //   console.log("filtered");
   return (
     <div className="py-2">
       <STable data={data} dispatch={dispatch} plotList={plotList} />
@@ -172,13 +172,18 @@ function STable(props) {
   function toggleDot(dot) {
     dispatch(addtoMultiPlotCouponList(dot));
   }
+  const [show, setShow] = useState(true);
+  console.log(show);
   // console.log(plotList);
   return (
     <div className="overflow-x-auto w-full">
       <table className="table table-compact w-full">
         <thead>
           <tr>
-            <th>Coupon</th>
+            <th>
+              {" "}
+              <button onClick={() =>setShow(!show)}>Coupon </button>
+            </th>
             <th>d1</th>
             <th>d2</th>
             <th>d3</th>
@@ -186,33 +191,35 @@ function STable(props) {
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          {unique.map(function (d) {
-            return (
-              <tr>
-                <td>
-                  <div className="flex items-center space-x-3"> {d} </div>
-                </td>
+        {show ? (
+          <tbody>
+            {unique.map(function (d) {
+              return (
+                <tr>
+                  <td>
+                    <div className="flex items-center space-x-3"> {d} </div>
+                  </td>
 
-                {["1", "2", "3", "4"].map(function (e) {
-                  let isChecked = plotList.includes(d + "d" + e);
-                  return (
-                    <td>
-                      <div>
-                        <input
-                          type="checkbox"
-                          className="toggle w-4 h-4"
-                          defaultChecked={isChecked}
-                          onClick={() => toggleDot(d + "d" + e)}
-                        />
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
+                  {["1", "2", "3", "4"].map(function (e) {
+                    let isChecked = plotList.includes(d + "d" + e);
+                    return (
+                      <td>
+                        <div>
+                          <input
+                            type="checkbox"
+                            className="toggle w-4 h-4"
+                            defaultChecked={isChecked}
+                            onClick={() => toggleDot(d + "d" + e)}
+                          />
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        ) : null}
       </table>
     </div>
   );
