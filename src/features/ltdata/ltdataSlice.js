@@ -18,9 +18,19 @@ export const fetchLTData = createAsyncThunk("users/fetchLTData", async (id) => {
   );
   console.log(snapshot)
 //   const snapshot = await axios.get(`http://ltquickview.udc.local/api/v1.0/data/life${id}`);
-  const keyword = await axios.post(
-    "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id }])
-  );
+  // const keyword = await axios.post(
+  //   "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id }])
+  // );
+  let keyword = ""
+  try {
+    const keyword = await axios.post(
+      "http://ltquickview/api/v1.0/data/keywords",
+      JSON.stringify([{ sampleID: id + "-1d1" }])
+    );
+  } catch (error) {
+    console.error("Error fetching keywords:", error);
+    keyword = ""; // Set keyword to an empty string if there is an error
+  }
   console.log(keyword)
   if (snapshot.status === 200){
     newdata = {

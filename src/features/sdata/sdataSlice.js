@@ -16,9 +16,19 @@ const initialState = {
 export const fetchSData = createAsyncThunk("users/fetchSData", async (id) => {
   let newdata = {};
   const snapshot = await axios.get(`http://tmdata.udc.local/api/spectral/${id}`);
-  const keyword = await axios.post(
-    "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id+"-1d1" }])
-  );
+  // const keyword = await axios.post(
+  //   "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id+"-1d1" }])
+  // )
+  let keyword = ""
+  try {
+    const keyword = await axios.post(
+      "http://ltquickview/api/v1.0/data/keywords",
+      JSON.stringify([{ sampleID: id + "-1d1" }])
+    );
+  } catch (error) {
+    console.error("Error fetching keywords:", error);
+    keyword = ""; // Set keyword to an empty string if there is an error
+  }
   let merged = snapshot.data.map( 
     function( d ) {
       console.log(snapshot.data)

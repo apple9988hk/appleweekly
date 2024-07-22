@@ -22,10 +22,16 @@ export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
   const snapshot2 = await axios.get(
     `http://tmdata.udc.local/api/jvl/summary/${id}`
   );
-  const keyword = await axios.post(
-    "http://ltquickview/api/v1.0/data/keywords",
-    JSON.stringify([{ sampleID: id + "-1d1" }])
-  );
+  let keyword = ""
+  try {
+    const keyword = await axios.post(
+      "http://ltquickview/api/v1.0/data/keywords",
+      JSON.stringify([{ sampleID: id + "-1d1" }])
+    );
+  } catch (error) {
+    console.error("Error fetching keywords:", error);
+    keyword = ""; // Set keyword to an empty string if there is an error
+  }
   let merged = snapshot.data.map(function (d) {
     console.log(snapshot2.data);
     console.log(d.SampleID);
@@ -46,8 +52,14 @@ export const fetchJData = createAsyncThunk("users/fetchJData", async (id) => {
 
   newdata["data"] = merged;
   newdata["id"] = id;
-  newdata["keywords"] = keyword.data[0]["keywords"];
-  newdata["substrate"] = keyword.data[0]["substrate"];
+  if (keyword === ""){
+    newdata["keywords"] = ""
+    newdata["substrate"] = ""
+  } else {
+    newdata["keywords"] = keyword.data[0]["keywords"];
+    newdata["substrate"] = keyword.data[0]["substrate"];
+  }
+  // console.log(newdata)
   return newdata;
 });
 
@@ -60,10 +72,16 @@ export const fetchSpectral = createAsyncThunk(
     const snapshot = await axios.get(
       `http://tmdata.udc.local/api/spectral/${id}`
     );
-    const keyword = await axios.post(
-      "http://ltquickview/api/v1.0/data/keywords",
-      JSON.stringify([{ sampleID: id + "-1d1" }])
-    );
+    let keyword = ""
+    try {
+      const keyword = await axios.post(
+        "http://ltquickview/api/v1.0/data/keywords",
+        JSON.stringify([{ sampleID: id + "-1d1" }])
+      );
+    } catch (error) {
+      console.error("Error fetching keywords:", error);
+      keyword = ""; // Set keyword to an empty string if there is an error
+    }
     let merged = snapshot.data.map(function (d) {
       console.log(snapshot.data);
       console.log(d.SampleID);
