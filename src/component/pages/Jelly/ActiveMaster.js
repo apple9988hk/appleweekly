@@ -114,7 +114,6 @@ function ActiveMaster() {
     </>
   );
 }
-78
 
 
 function ActiveISumTable(props) {
