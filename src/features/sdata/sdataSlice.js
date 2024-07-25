@@ -44,8 +44,15 @@ export const fetchSData = createAsyncThunk("users/fetchSData", async (id) => {
   console.log(merged)
   newdata['data'] = merged;
   newdata['id'] = id;
-  newdata['keywords'] = keyword.data[0]['keywords'];
-  newdata['substrate'] = keyword.data[0]['substrate'];
+  if (keyword === ""){
+    newdata["keywords"] = ""
+    newdata["substrate"] = ""
+  } else {
+    newdata["keywords"] = keyword.data[0]["keywords"];
+    newdata["substrate"] = keyword.data[0]["substrate"];
+  }
+  // newdata['keywords'] = keyword.data[0]['keywords'];
+  // newdata['substrate'] = keyword.data[0]['substrate'];
   return newdata;
 });
 
