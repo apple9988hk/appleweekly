@@ -1,6 +1,7 @@
 import FetchLT from "./FetchLT"
 import FetchLTDisplay from "./FetchLTDisplay"
 import LTPlotSingle from "./LTPlotSingle"
+import LTPlotContainer from "./LTPlotContainer"
 
 function LTView() {
   return (
@@ -9,9 +10,10 @@ function LTView() {
           LT View
         </div>
         
-        <FetchLT />
+        {/* <FetchLT />
         <FetchLTDisplay />
-        <LTPlotSingle />
+        <LTPlotSingle /> */}
+        <LTPlotContainer />
       
     </div>
   )

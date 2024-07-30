@@ -13,36 +13,12 @@ const initialState = {
 
 export const fetchLTData = createAsyncThunk("users/fetchLTData", async (id) => {
   let newdata = {};
-  const snapshot = await axios.post(
-    "http://ltquickview.udc.local/api/v1.0/data/life", JSON.stringify([{ "sampleID": id }])
-  );
-  console.log(snapshot)
-//   const snapshot = await axios.get(`http://ltquickview.udc.local/api/v1.0/data/life${id}`);
-  // const keyword = await axios.post(
-  //   "http://ltquickview/api/v1.0/data/keywords", JSON.stringify([{ "sampleID": id }])
-  // );
-  let keyword = ""
-  try {
-    const keyword = await axios.post(
-      "http://ltquickview/api/v1.0/data/keywords",
-      JSON.stringify([{ sampleID: id + "-1d1" }])
-    );
-  } catch (error) {
-    console.error("Error fetching keywords:", error);
-    keyword = ""; // Set keyword to an empty string if there is an error
-  }
-  console.log(keyword)
+  const snapshot = await axios.get(
+    `http://tmdata.udc.local/api/life/${id}`
+  )
+ 
   if (snapshot.status === 200){
-    newdata = {
-        ...newdata,
-        ...snapshot.data[0],
-    }
-  }
-  if (keyword.status === 200){
-    newdata = {
-        ...newdata,
-        ...keyword.data[0]
-    }
+    newdata = snapshot.data
   }
   return newdata;
 });
@@ -51,19 +27,10 @@ export const ltdataSlice = createSlice({
   name: "ltdata",
   initialState,
   reducers: {
-    // addJData : (state, action) => {
-    //     state.data.push(action.payload);
-    // },
     toIdle(state, action) {
       state.status = "idle";
     },
-    addtoWatchList: (state, action) => {
-        const index = state.watchList.indexOf(action.payload);
-        if (index > -1) { // only splice array when item is found
-            state.watchList.splice(index, 1); // 2nd parameter means remove one item only
-        }
-        state.watchList.push(action.payload)
-      },
+
   },
   extraReducers: {
     [fetchLTData.pending]: (state, action) => {
@@ -71,9 +38,16 @@ export const ltdataSlice = createSlice({
     },
     [fetchLTData.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      console.log(action.payload)
-      state.data = state.data.concat(action.payload)
-      state.idList.push({"id":action.payload.key, "keywords": action.payload.keywords})
+
+      const newData = action.payload;
+      const groupedData = _.groupBy(newData, 'SampleID');
+      state.data = state.data.filter(item => !groupedData[item.key]);
+      for (const [sampleID, data] of Object.entries(groupedData)) {
+        state.data.push({ "key": sampleID, "data":data });
+      }
+
+      const newSampleIDs = Object.keys(groupedData);
+      state.idList = _.uniq(state.idList.concat(newSampleIDs));
     },
     [fetchLTData.rejected]: (state, action) => {
       state.status = "failed";
