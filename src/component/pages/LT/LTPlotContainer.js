@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLTData } from "../../../features/ltdata/ltdataSlice";
 import _ from "lodash";
 import Plot from "react-plotly.js";
-import { ChevronsDown } from "lucide-react";
+import { ChevronsDown, ChevronsUp, Search } from "lucide-react";
 
 function LTPlotContainer() {
   const [plots, setPlots] = useState([]);
@@ -11,29 +11,65 @@ function LTPlotContainer() {
   const [x2, setX2] = useState("");
   const [y1, setY1] = useState("");
   const [y2, setY2] = useState("");
-  const nextId = useRef(0); // Ref to keep track of the next unique ID
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [batchPlotInput, setBatchPlotInput] = useState("");
 
-  const addPlot = () => {
-    setPlots([...plots, nextId.current++]); // Add a new plot with a unique ID
+  const nextId = useRef(0); // Ref to keep track of the next unique IDa
+
+  const addPlot = (plotId) => {
+    // console.log("Add plot", plotId)
+    // Check if the plot already exists
+    if (!plots.includes(plotId)) {
+      setPlots([...plots, plotId]);
+    }
   };
 
   const removePlot = (id) => {
     setPlots(plots.filter((plotId) => plotId !== id)); // Remove the plot with the given ID
   };
 
-  const addPlotFromButton = () => {
-    addPlot(); // Reuse the addPlot function to add a new plot
+  const handleInputChange_batchPlot = (event) => {
+    setBatchPlotInput(event.target.value);
+  };
+
+  const handleBatchPlotButton = () => {
+    const trimmedInput = batchPlotInput.trim();
+    const regex = /^(.{9})(.+)$/; // Base is the first 9 characters, suffix is the rest
+    const match = trimmedInput.match(regex);
+    // console.log(match)
+
+    if (match) {
+      const base = match[1];
+      const suffix = match[2];
+      
+      const newPlots = new Set(plots);
+
+      for (const char of suffix) {
+        newPlots.add(`${base}${char}`);
+      }
+      
+      setPlots([...newPlots]);
+      
+      // setBatchPlotInput(""); // Clear the input field
+    }
   };
 
   return (
-    <div className="pt-5  pb-10">
+    <div className="pt-5 pb-10">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button className="btn btn-outline btn-sm" onClick={addPlot}>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => addPlot(nextId.current++)}
+          >
             Add Plot
           </button>
-          <button>
-            <ChevronsDown className="w-4 h-4" />
+          <button onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>
+            {showAdvancedOptions ? (
+              <ChevronsUp className="w-4 h-4" />
+            ) : (
+              <ChevronsDown className="w-4 h-4" />
+            )}
           </button>
         </div>
 
@@ -71,12 +107,38 @@ function LTPlotContainer() {
         </div>
       </div>
 
+      {showAdvancedOptions && (
+        <div className="p-2 border rounded-md mt-2">
+          <div className="flex items-center py-5">
+            <label className="input input-bordered flex items-center gap-2 w-full">
+              Batch Plot
+              <input
+                type="text"
+                placeholder="H-072224-1234"
+                className="grow focus:outline-none focus:ring-0 w-full flex-1"
+                onChange={handleInputChange_batchPlot}
+                value={batchPlotInput}
+              />
+              <button
+                className="btn btn-sm btn-circle btn-outline"
+                onClick={handleBatchPlotButton}
+              >
+                <Search className="w-5 h-5 p-0" />
+              </button>
+            </label>
+          </div>
+        </div>
+      )}
+
       {plots.map((plotId) => (
         <div
           key={plotId}
           style={{ position: "relative", marginBottom: "10px" }}
         >
-          <LTSinglePlot sampleID_input="" plotRange={{ x1, x2, y1, y2 }} />
+          <LTSinglePlot
+            sampleID_input={plotId}
+            plotRange={{ x1, x2, y1, y2 }}
+          />
           <button
             onClick={() => removePlot(plotId)}
             style={{
@@ -101,7 +163,7 @@ function LTPlotContainer() {
       ))}
       <div className="text-center mt-2">
         <button
-          onClick={addPlotFromButton}
+          onClick={() => addPlot(nextId.current++)}
           style={{
             marginTop: "10px",
             backgroundColor: "green",
@@ -122,30 +184,46 @@ function LTPlotContainer() {
 export default LTPlotContainer;
 
 const LTSinglePlot = ({ sampleID_input, plotRange }) => {
-  const globalPlotRange = plotRange
+  const globalPlotRange = plotRange;
   const ltdataStatus = useSelector((state) => state.ltdata.status);
   const ltdataSet = useSelector((state) => state.ltdata.data);
-
   const [sampleID, setSampleID] = useState(sampleID_input);
   const [plotData, setPlotData] = useState([]);
   const [dataFound, setDataFound] = useState(true);
   const [plotted, setPlotted] = useState(false);
-
   const dispatch = useDispatch();
 
-  const addLTData = () => {
+  // const addLTData = () => {
+  //   dispatch(fetchLTData(sampleID));
+  //   // console.log("setPlot as False")
+  //   setPlotted(false);
+  // };
+
+  const addLTData = useCallback(() => {
     dispatch(fetchLTData(sampleID));
-    // console.log("setPlot as False")
     setPlotted(false);
-  };
+  }, [dispatch, sampleID]);
+
+   // Use useEffect to fetch data on mount and when sampleID changes
+   useEffect(() => {
+    if (sampleID !== "" && sampleID.length >= 10) {
+      addLTData();
+    }
+  }, [sampleID, addLTData]);
 
   const layout = {
     xaxis: {
-      range: globalPlotRange.x1 && globalPlotRange.x2 ? [globalPlotRange.x1, globalPlotRange.x2] : 'auto'
+      range:
+        globalPlotRange.x1 && globalPlotRange.x2
+          ? [globalPlotRange.x1, globalPlotRange.x2]
+          : "auto",
     },
     yaxis: {
-      range: globalPlotRange.y1 && globalPlotRange.y2 ? [globalPlotRange.y1, globalPlotRange.y2] : 'auto'
-    }
+      range:
+        globalPlotRange.y1 && globalPlotRange.y2
+          ? [globalPlotRange.y1, globalPlotRange.y2]
+          : "auto",
+    },
   };
 
   useEffect(() => {
@@ -183,7 +261,7 @@ const LTSinglePlot = ({ sampleID_input, plotRange }) => {
             ],
           },
           marker: { symbol: [0, 1, 5][index % 3] },
-          displayModeBar: true,
+          // displayModeBar: true,
         };
       });
       // console.log("processedData",processedData)
@@ -217,9 +295,9 @@ const LTSinglePlot = ({ sampleID_input, plotRange }) => {
         </button>
       </div>
       {dataFound ? (
-        <LtPlotView plotData={plotData} sampleID={sampleID} layout={layout}/>
+        <LtPlotView plotData={plotData} sampleID={sampleID} layout={layout} />
       ) : (
-        <LtPlotView plotData={[]} sampleID={sampleID} layout={layout}/>
+        <LtPlotView plotData={[]} sampleID={sampleID} layout={layout} />
       )}
     </div>
   );
@@ -242,12 +320,18 @@ const LtPlotView = ({ plotData, sampleID, layout }) => {
       <Plot
         data={plotData}
         layout={{
-          width: screenWidth > 1240 ? 1240 : screenWidth,
+          width: screenWidth > 1240 ? 1240 : screenWidth *0.95,
           height: 500,
           title: sampleID,
-          xaxis: { title: "Time (Hours)", range: layout.xaxis.range},
+          xaxis: { title: "Time (Hours)", range: layout.xaxis.range },
           yaxis: { title: "Normalized Luminance", range: layout.yaxis.range },
-          margin: { t: 30 }, // Adjust this value as needed to reduce the distance
+          margin: { t: 50, r: 250 }, // Adjust this value as needed to reduce the distance
+          modebar: {
+            orientation: "v",
+            remove:["zoomin", "zoomout","zoom","lasso","select"],
+            add:["drawline","drawrect","eraseshape"]
+          },
+
         }}
         useResizeHandler={true}
         style={{ width: "100%", height: "500px" }}
