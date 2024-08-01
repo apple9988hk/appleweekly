@@ -3,10 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchLTData } from "../../../features/ltdata/ltdataSlice";
 import _ from "lodash";
 import Plot from "react-plotly.js";
+import { ChevronsDown } from "lucide-react";
 
 function LTPlotContainer() {
   const [plots, setPlots] = useState([]);
-  console.log(plots);
+  const [x1, setX1] = useState("");
+  const [x2, setX2] = useState("");
+  const [y1, setY1] = useState("");
+  const [y2, setY2] = useState("");
   const nextId = useRef(0); // Ref to keep track of the next unique ID
 
   const addPlot = () => {
@@ -23,15 +27,56 @@ function LTPlotContainer() {
 
   return (
     <div className="pt-5  pb-10">
-      <button className="btn btn-outline btn-sm" onClick={addPlot}>
-        Add Plot
-      </button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button className="btn btn-outline btn-sm" onClick={addPlot}>
+            Add Plot
+          </button>
+          <button>
+            <ChevronsDown className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center space-x-2 p-2">
+          <div className="flex items-center space-x-1">
+            <label className="text-gray-700 font-medium">X:</label>
+            <input
+              type="text"
+              value={x1}
+              onChange={(e) => setX1(e.target.value)}
+              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+            />
+            <input
+              type="text"
+              value={x2}
+              onChange={(e) => setX2(e.target.value)}
+              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+            />
+          </div>
+          <div className="flex items-center space-x-1">
+            <label className="text-gray-700 font-medium">Y:</label>
+            <input
+              type="text"
+              value={y1}
+              onChange={(e) => setY1(e.target.value)}
+              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+            />
+            <input
+              type="text"
+              value={y2}
+              onChange={(e) => setY2(e.target.value)}
+              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+            />
+          </div>
+        </div>
+      </div>
+
       {plots.map((plotId) => (
         <div
           key={plotId}
           style={{ position: "relative", marginBottom: "10px" }}
         >
-          <LTSinglePlot sampleID_input="" />
+          <LTSinglePlot sampleID_input="" plotRange={{ x1, x2, y1, y2 }} />
           <button
             onClick={() => removePlot(plotId)}
             style={{
@@ -76,7 +121,8 @@ function LTPlotContainer() {
 
 export default LTPlotContainer;
 
-const LTSinglePlot = ({ sampleID_input }) => {
+const LTSinglePlot = ({ sampleID_input, plotRange }) => {
+  const globalPlotRange = plotRange
   const ltdataStatus = useSelector((state) => state.ltdata.status);
   const ltdataSet = useSelector((state) => state.ltdata.data);
 
@@ -93,6 +139,15 @@ const LTSinglePlot = ({ sampleID_input }) => {
     setPlotted(false);
   };
 
+  const layout = {
+    xaxis: {
+      range: globalPlotRange.x1 && globalPlotRange.x2 ? [globalPlotRange.x1, globalPlotRange.x2] : 'auto'
+    },
+    yaxis: {
+      range: globalPlotRange.y1 && globalPlotRange.y2 ? [globalPlotRange.y1, globalPlotRange.y2] : 'auto'
+    }
+  };
+
   useEffect(() => {
     // console.log("process and plot")
     if (sampleID !== "") {
@@ -102,8 +157,6 @@ const LTSinglePlot = ({ sampleID_input }) => {
           o.data.some((item) => item.SampleID.slice(0, 10) === sampleID)
         );
       });
-
-      // console.log("filteredData",filteredData)
 
       if (filteredData.length === 0) {
         setDataFound(false);
@@ -116,10 +169,11 @@ const LTSinglePlot = ({ sampleID_input }) => {
         const sampleID = entry.key;
         const group = entry.data;
         const divisor = group[0].Luminance;
-
+        const x = group.map((item) => item.TimeInHours);
+        const y = group.map((item) => item.Luminance / divisor);
         return {
-          x: group.map((item) => item.TimeInHours),
-          y: group.map((item) => item.Luminance / divisor),
+          x,
+          y,
           type: "scatter",
           mode: "lines+markers",
           name: `${sampleID}_LT ${group[0].ChargingCurrentDensity}J`,
@@ -129,14 +183,14 @@ const LTSinglePlot = ({ sampleID_input }) => {
             ],
           },
           marker: { symbol: [0, 1, 5][index % 3] },
-          displayModeBar: false,
+          displayModeBar: true,
         };
       });
-
+      // console.log("processedData",processedData)
       setPlotData(processedData);
       setPlotted(true);
     }
-  }, [ltdataSet, sampleID, plotted]);
+  }, [ltdataSet, sampleID, plotted, plotRange]);
 
   // console.log("plotData", plotData);
 
@@ -163,18 +217,15 @@ const LTSinglePlot = ({ sampleID_input }) => {
         </button>
       </div>
       {dataFound ? (
-        <LtPlotView plotData={plotData} sampleID={sampleID} />
+        <LtPlotView plotData={plotData} sampleID={sampleID} layout={layout}/>
       ) : (
-        <LtPlotView plotData={[]} sampleID={sampleID} />
-        // <span className="text-center mx-auto items-center">
-        //   Data not found for SampleID: {sampleID}
-        // </span>
+        <LtPlotView plotData={[]} sampleID={sampleID} layout={layout}/>
       )}
     </div>
   );
 };
 
-const LtPlotView = ({ plotData, sampleID }) => {
+const LtPlotView = ({ plotData, sampleID, layout }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   useEffect(() => {
     const handleResize = () => {
@@ -191,11 +242,11 @@ const LtPlotView = ({ plotData, sampleID }) => {
       <Plot
         data={plotData}
         layout={{
-          width: screenWidth * 0.9,
+          width: screenWidth > 1240 ? 1240 : screenWidth,
           height: 500,
           title: sampleID,
-          xaxis: { title: "Time (Hours)" },
-          yaxis: { title: "Normalized Luminance" },
+          xaxis: { title: "Time (Hours)", range: layout.xaxis.range},
+          yaxis: { title: "Normalized Luminance", range: layout.yaxis.range },
           margin: { t: 30 }, // Adjust this value as needed to reduce the distance
         }}
         useResizeHandler={true}
