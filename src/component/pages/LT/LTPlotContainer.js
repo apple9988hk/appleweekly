@@ -1,9 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLTData } from "../../../features/ltdata/ltdataSlice";
-import _ from "lodash";
+import _, { filter } from "lodash";
 import Plot from "react-plotly.js";
 import { ChevronsDown, ChevronsUp, Search } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+
+
+// Custom hook to debounce a value
+export function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 function LTPlotContainer() {
   const [plots, setPlots] = useState([]);
@@ -13,6 +32,16 @@ function LTPlotContainer() {
   const [y2, setY2] = useState("");
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [batchPlotInput, setBatchPlotInput] = useState("");
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract query parameters from the URL
+  const plotlistParam = new URLSearchParams(location.search).get("plotlist");
+  const x1Param = new URLSearchParams(location.search).get("x1");
+  const x2Param = new URLSearchParams(location.search).get("x2");
+  const y1Param = new URLSearchParams(location.search).get("y1");
+  const y2Param = new URLSearchParams(location.search).get("y2");
 
   const nextId = useRef(0); // Ref to keep track of the next unique IDa
 
@@ -28,6 +57,41 @@ function LTPlotContainer() {
     setPlots(plots.filter((plotId) => plotId !== id)); // Remove the plot with the given ID
   };
 
+  useEffect(() => {
+    if (plotlistParam) {
+      const plotIds = plotlistParam.split(",").map((id) => id.trim());
+      setPlots(plotIds);
+    }
+
+    if (x1Param) setX1(x1Param);
+    if (x2Param) setX2(x2Param);
+    if (y1Param) setY1(y1Param);
+    if (y2Param) setY2(y2Param);
+  }, [plotlistParam, x1Param, x2Param, y1Param, y2Param]);
+
+  const updateURLParams = () => {
+    const params = new URLSearchParams(location.search);
+    params.set("plotlist", plots.join(","));
+    if (x1) params.set("x1", x1);
+    if (x2) params.set("x2", x2);
+    if (y1) params.set("y1", y1);
+    if (y2) params.set("y2", y2);
+    navigate({ search: params.toString() });
+  };
+
+  useEffect(() => {
+    // Update the URL when plots or ranges change
+    updateURLParams();
+    // console.log(plots);
+  }, [plots, x1, x2, y1, y2]);
+
+  // Callback function to update sampleID
+  const updateSampleID = (oldSampleID, newSampleID) => {
+    setPlots((prevPlots) =>
+      prevPlots.map((plotId) => (plotId === oldSampleID ? newSampleID : plotId))
+    );
+  };
+
   const handleInputChange_batchPlot = (event) => {
     setBatchPlotInput(event.target.value);
   };
@@ -41,15 +105,15 @@ function LTPlotContainer() {
     if (match) {
       const base = match[1];
       const suffix = match[2];
-      
+
       const newPlots = new Set(plots);
 
       for (const char of suffix) {
         newPlots.add(`${base}${char}`);
       }
-      
+
       setPlots([...newPlots]);
-      
+
       // setBatchPlotInput(""); // Clear the input field
     }
   };
@@ -138,6 +202,7 @@ function LTPlotContainer() {
           <LTSinglePlot
             sampleID_input={plotId}
             plotRange={{ x1, x2, y1, y2 }}
+            onSampleIDChange={updateSampleID}
           />
           <button
             onClick={() => removePlot(plotId)}
@@ -183,7 +248,38 @@ function LTPlotContainer() {
 
 export default LTPlotContainer;
 
-const LTSinglePlot = ({ sampleID_input, plotRange }) => {
+function processData(data) {
+  const result = [];
+  const couponMap = new Map();
+
+  data.forEach((item) => {
+    const sampleID = item.key;
+    const couponID = sampleID.charAt(11);
+    const pixelID = sampleID.charAt(13);
+
+    const latestSample = item.data.reduce((latest, current) => {
+      return new Date(current.SampleTime) > new Date(latest.SampleTime)
+        ? current
+        : latest;
+    });
+
+    if (
+      !couponMap.has(couponID) ||
+      new Date(latestSample.SampleTime) >
+        new Date(couponMap.get(couponID).SampleTime)
+    ) {
+      couponMap.set(couponID, { pixelID, SampleTime: latestSample.SampleTime });
+    }
+  });
+
+  couponMap.forEach((value, key) => {
+    result.push({ couponID: key, pixelID: value.pixelID });
+  });
+
+  return result;
+}
+
+const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange  }) => {
   const globalPlotRange = plotRange;
   const ltdataStatus = useSelector((state) => state.ltdata.status);
   const ltdataSet = useSelector((state) => state.ltdata.data);
@@ -193,19 +289,13 @@ const LTSinglePlot = ({ sampleID_input, plotRange }) => {
   const [plotted, setPlotted] = useState(false);
   const dispatch = useDispatch();
 
-  // const addLTData = () => {
-  //   dispatch(fetchLTData(sampleID));
-  //   // console.log("setPlot as False")
-  //   setPlotted(false);
-  // };
-
   const addLTData = useCallback(() => {
     dispatch(fetchLTData(sampleID));
     setPlotted(false);
   }, [dispatch, sampleID]);
 
-   // Use useEffect to fetch data on mount and when sampleID changes
-   useEffect(() => {
+  // Use useEffect to fetch data on mount and when sampleID changes
+  useEffect(() => {
     if (sampleID !== "" && sampleID.length >= 10) {
       addLTData();
     }
@@ -243,12 +333,18 @@ const LTSinglePlot = ({ sampleID_input, plotRange }) => {
         setDataFound(true);
       }
 
-      const processedData = filteredData.map((entry, index) => {
+      const processedCouponData = processData(filteredData);
+
+      const processedData = processedCouponData.map((couponInfo) => {
+        const entry = filteredData.find(
+          (item) => item.key.charAt(11) === couponInfo.couponID
+        );
         const sampleID = entry.key;
         const group = entry.data;
         const divisor = group[0].Luminance;
         const x = group.map((item) => item.TimeInHours);
         const y = group.map((item) => item.Luminance / divisor);
+
         return {
           x,
           y,
@@ -257,13 +353,13 @@ const LTSinglePlot = ({ sampleID_input, plotRange }) => {
           name: `${sampleID}_LT ${group[0].ChargingCurrentDensity}J`,
           line: {
             color: ["rgb(55,126,184)", "rgb(228,26,28)", "rgb(77,175,74)"][
-              Math.floor(index / 3)
+              Math.floor((Number(couponInfo.couponID) - 1) / 3)
             ],
           },
-          marker: { symbol: [0, 1, 5][index % 3] },
-          // displayModeBar: true,
+          marker: { symbol: [0, 1, 5][(Number(couponInfo.couponID) - 1) % 3] },
         };
       });
+
       // console.log("processedData",processedData)
       setPlotData(processedData);
       setPlotted(true);
@@ -320,7 +416,7 @@ const LtPlotView = ({ plotData, sampleID, layout }) => {
       <Plot
         data={plotData}
         layout={{
-          width: screenWidth > 1240 ? 1240 : screenWidth *0.95,
+          width: screenWidth > 1240 ? 1240 : screenWidth * 0.95,
           height: 500,
           title: sampleID,
           xaxis: { title: "Time (Hours)", range: layout.xaxis.range },
@@ -328,10 +424,9 @@ const LtPlotView = ({ plotData, sampleID, layout }) => {
           margin: { t: 50, r: 250 }, // Adjust this value as needed to reduce the distance
           modebar: {
             orientation: "v",
-            remove:["zoomin", "zoomout","zoom","lasso","select"],
-            add:["drawline","drawrect","eraseshape"]
+            remove: ["zoomin", "zoomout", "zoom", "lasso", "select"],
+            add: ["drawline", "drawrect", "eraseshape"],
           },
-
         }}
         useResizeHandler={true}
         style={{ width: "100%", height: "500px" }}
