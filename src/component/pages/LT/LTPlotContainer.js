@@ -9,7 +9,7 @@ import { removeListener } from "@reduxjs/toolkit";
 
 function LTPlotContainer() {
   const [plots, setPlots] = useState([]);
-  console.log("plots", plots)
+  // console.log("plots", plots)
   const [x1, setX1] = useState("");
   const [x2, setX2] = useState("");
   const [y1, setY1] = useState("");
@@ -44,7 +44,7 @@ function LTPlotContainer() {
   };
 
   useEffect(() => {
-    console.log("plotlistParam" , plotlistParam)
+    // console.log("plotlistParam" , plotlistParam)
     if (plotlistParam) {
       const plotIds = plotlistParam.split(",").map((id) => id.trim());
       setPlots(plotIds.map((plotId, index) => ({ id: index, plotId })));
@@ -97,7 +97,7 @@ function LTPlotContainer() {
 
   const handleBatchPlotButton = () => {
     const trimmedInput = batchPlotInput.trim();
-    console.log(batchPlotInput)
+    // console.log(batchPlotInput)
     const regex = /^(.{9})(.+)$/; // Base is the first 9 characters, suffix is the rest
     const match = trimmedInput.match(regex);
 
