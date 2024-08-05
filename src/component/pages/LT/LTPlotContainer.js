@@ -39,6 +39,7 @@ function LTPlotContainer() {
   };
 
   const removeAllPlots = () => {
+    console.log(plots)
     setPlots([]);
     nextId.current = 0; // Reset the ID counter
   };
@@ -129,7 +130,7 @@ function LTPlotContainer() {
           </button>
           <button
             className="btn btn-outline btn-sm"
-            onClick={() => removeAllPlots}
+            onClick={() => removeAllPlots()}
           >
             Remove All
           </button>
