@@ -5,27 +5,11 @@ import _, { filter } from "lodash";
 import Plot from "react-plotly.js";
 import { ChevronsDown, ChevronsUp, Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-
-
-// Custom hook to debounce a value
-export function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+import { removeListener } from "@reduxjs/toolkit";
 
 function LTPlotContainer() {
   const [plots, setPlots] = useState([]);
+  console.log("plots", plots)
   const [x1, setX1] = useState("");
   const [x2, setX2] = useState("");
   const [y1, setY1] = useState("");
@@ -46,21 +30,29 @@ function LTPlotContainer() {
   const nextId = useRef(0); // Ref to keep track of the next unique IDa
 
   const addPlot = (plotId) => {
-    // console.log("Add plot", plotId)
-    // Check if the plot already exists
-    if (!plots.includes(plotId)) {
-      setPlots([...plots, plotId]);
-    }
+    const newPlotId = nextId.current++;
+    setPlots([...plots, { id: newPlotId, plotId: "" }]);
   };
 
   const removePlot = (id) => {
-    setPlots(plots.filter((plotId) => plotId !== id)); // Remove the plot with the given ID
+    setPlots(plots.filter((plot) => plot.id !== id));
+  };
+
+  const removeAllPlots = () => {
+    setPlots([]);
+    nextId.current = 0; // Reset the ID counter
   };
 
   useEffect(() => {
+    console.log("plotlistParam" , plotlistParam)
     if (plotlistParam) {
       const plotIds = plotlistParam.split(",").map((id) => id.trim());
-      setPlots(plotIds);
+      setPlots(plotIds.map((plotId, index) => ({ id: index, plotId })));
+      nextId.current = plotIds.length;
+    } else {
+      removeAllPlots()
+      // setPlots([])
+      // nextId.current = 0
     }
 
     if (x1Param) setX1(x1Param);
@@ -71,7 +63,7 @@ function LTPlotContainer() {
 
   const updateURLParams = () => {
     const params = new URLSearchParams(location.search);
-    params.set("plotlist", plots.join(","));
+    params.set("plotlist", plots.map((plot) => plot.plotId).join(","));
     if (x1) params.set("x1", x1);
     if (x2) params.set("x2", x2);
     if (y1) params.set("y1", y1);
@@ -80,15 +72,17 @@ function LTPlotContainer() {
   };
 
   useEffect(() => {
-    // Update the URL when plots or ranges change
     updateURLParams();
     // console.log(plots);
   }, [plots, x1, x2, y1, y2]);
 
-  // Callback function to update sampleID
-  const updateSampleID = (oldSampleID, newSampleID) => {
+  // Callback function to update plotId
+  const updatePlotId = (id, newPlotId) => {
+    // console.log("updatePlotId", id, newPlotId)
     setPlots((prevPlots) =>
-      prevPlots.map((plotId) => (plotId === oldSampleID ? newSampleID : plotId))
+      prevPlots.map((plot) =>
+        plot.id === id ? { ...plot, plotId: newPlotId } : plot
+      )
     );
   };
 
@@ -96,25 +90,30 @@ function LTPlotContainer() {
     setBatchPlotInput(event.target.value);
   };
 
+  const handleBatchPlotSubmit = (e) => {
+    e.preventDefault();
+    handleBatchPlotButton()
+  }
+
   const handleBatchPlotButton = () => {
     const trimmedInput = batchPlotInput.trim();
+    console.log(batchPlotInput)
     const regex = /^(.{9})(.+)$/; // Base is the first 9 characters, suffix is the rest
     const match = trimmedInput.match(regex);
-    // console.log(match)
 
     if (match) {
       const base = match[1];
       const suffix = match[2];
 
-      const newPlots = new Set(plots);
+      const newPlots = [...plots];
 
       for (const char of suffix) {
-        newPlots.add(`${base}${char}`);
+        const newPlotId = `${base}${char}`;
+        if (!newPlots.some((plot) => plot.plotId === newPlotId)) {
+          newPlots.push({ id: nextId.current++, plotId: newPlotId });
+        }
       }
-
-      setPlots([...newPlots]);
-
-      // setBatchPlotInput(""); // Clear the input field
+      setPlots(newPlots);
     }
   };
 
@@ -127,6 +126,12 @@ function LTPlotContainer() {
             onClick={() => addPlot(nextId.current++)}
           >
             Add Plot
+          </button>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => removeAllPlots}
+          >
+            Remove All
           </button>
           <button onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>
             {showAdvancedOptions ? (
@@ -174,38 +179,38 @@ function LTPlotContainer() {
       {showAdvancedOptions && (
         <div className="p-2 border rounded-md mt-2">
           <div className="flex items-center py-5">
-            <label className="input input-bordered flex items-center gap-2 w-full">
-              Batch Plot
-              <input
-                type="text"
-                placeholder="H-072224-1234"
-                className="grow focus:outline-none focus:ring-0 w-full flex-1"
-                onChange={handleInputChange_batchPlot}
-                value={batchPlotInput}
-              />
-              <button
-                className="btn btn-sm btn-circle btn-outline"
-                onClick={handleBatchPlotButton}
-              >
-                <Search className="w-5 h-5 p-0" />
-              </button>
-            </label>
+            <form onSubmit={handleBatchPlotSubmit} className="w-full">
+              <label className="input input-bordered flex items-center gap-2 w-full">
+                Batch Plot
+                <input
+                  type="text"
+                  placeholder="H-072224-1234"
+                  className="grow focus:outline-none focus:ring-0 w-full flex-1"
+                  onChange={handleInputChange_batchPlot}
+                  value={batchPlotInput}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-sm btn-circle btn-outline"
+                  // onClick={handleBatchPlotButton}
+                >
+                  <Search className="w-5 h-5 p-0" />
+                </button>
+              </label>
+            </form>
           </div>
         </div>
       )}
 
-      {plots.map((plotId) => (
-        <div
-          key={plotId}
-          style={{ position: "relative", marginBottom: "10px" }}
-        >
+      {plots.map(({ id, plotId }) => (
+        <div key={id} style={{ position: "relative", marginBottom: "10px" }}>
           <LTSinglePlot
             sampleID_input={plotId}
             plotRange={{ x1, x2, y1, y2 }}
-            onSampleIDChange={updateSampleID}
+            onSampleIDChange={(newSampleID) => updatePlotId(id, newSampleID)}
           />
           <button
-            onClick={() => removePlot(plotId)}
+            onClick={() => removePlot(id)}
             style={{
               position: "absolute",
               top: 0,
@@ -248,38 +253,7 @@ function LTPlotContainer() {
 
 export default LTPlotContainer;
 
-function processData(data) {
-  const result = [];
-  const couponMap = new Map();
-
-  data.forEach((item) => {
-    const sampleID = item.key;
-    const couponID = sampleID.charAt(11);
-    const pixelID = sampleID.charAt(13);
-
-    const latestSample = item.data.reduce((latest, current) => {
-      return new Date(current.SampleTime) > new Date(latest.SampleTime)
-        ? current
-        : latest;
-    });
-
-    if (
-      !couponMap.has(couponID) ||
-      new Date(latestSample.SampleTime) >
-        new Date(couponMap.get(couponID).SampleTime)
-    ) {
-      couponMap.set(couponID, { pixelID, SampleTime: latestSample.SampleTime });
-    }
-  });
-
-  couponMap.forEach((value, key) => {
-    result.push({ couponID: key, pixelID: value.pixelID });
-  });
-
-  return result;
-}
-
-const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange  }) => {
+const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
   const globalPlotRange = plotRange;
   const ltdataStatus = useSelector((state) => state.ltdata.status);
   const ltdataSet = useSelector((state) => state.ltdata.data);
@@ -331,6 +305,7 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange  }) => {
         return;
       } else {
         setDataFound(true);
+        // onSampleIDChange(sampleID);
       }
 
       const processedCouponData = processData(filteredData);
@@ -366,6 +341,12 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange  }) => {
     }
   }, [ltdataSet, sampleID, plotted, plotRange]);
 
+  useEffect(() => {
+    if (dataFound === true) {
+      // console.log("update sampleID", sampleID)
+      onSampleIDChange(sampleID);
+    }
+  }, [dataFound]);
   // console.log("plotData", plotData);
 
   return (
@@ -376,7 +357,10 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange  }) => {
             type="text"
             placeholder="Input id"
             className="input input-bordered input-sm w-full max-w-xs"
-            onChange={(e) => setSampleID(e.target.value)}
+            onChange={(e) => {
+              setSampleID(e.target.value);
+              // onSampleIDChange(e.target.value);
+            }}
             value={sampleID}
           />
         </div>
@@ -398,6 +382,37 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange  }) => {
     </div>
   );
 };
+
+function processData(data) {
+  const result = [];
+  const couponMap = new Map();
+
+  data.forEach((item) => {
+    const sampleID = item.key;
+    const couponID = sampleID.charAt(11);
+    const pixelID = sampleID.charAt(13);
+
+    const latestSample = item.data.reduce((latest, current) => {
+      return new Date(current.SampleTime) > new Date(latest.SampleTime)
+        ? current
+        : latest;
+    });
+
+    if (
+      !couponMap.has(couponID) ||
+      new Date(latestSample.SampleTime) >
+        new Date(couponMap.get(couponID).SampleTime)
+    ) {
+      couponMap.set(couponID, { pixelID, SampleTime: latestSample.SampleTime });
+    }
+  });
+
+  couponMap.forEach((value, key) => {
+    result.push({ couponID: key, pixelID: value.pixelID });
+  });
+
+  return result;
+}
 
 const LtPlotView = ({ plotData, sampleID, layout }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
