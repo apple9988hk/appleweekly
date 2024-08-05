@@ -6,6 +6,7 @@ import Plot from "react-plotly.js";
 import { ChevronsDown, ChevronsUp, Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { removeListener } from "@reduxjs/toolkit";
+import { Link } from "react-router-dom";
 
 function LTPlotContainer() {
   const [plots, setPlots] = useState([]);
@@ -39,22 +40,32 @@ function LTPlotContainer() {
   };
 
   const removeAllPlots = () => {
-    console.log(plots)
+    console.log(plots);
     setPlots([]);
     nextId.current = 0; // Reset the ID counter
   };
 
+  const handleResetAndNavigate = () => {
+    removeAllPlots();
+    navigate("/LT?plotlist=");
+  };
+
   useEffect(() => {
-    // console.log("plotlistParam" , plotlistParam)
+    console.log("plotlistParam", plotlistParam);
     if (plotlistParam) {
-      const plotIds = plotlistParam.split(",").map((id) => id.trim());
-      setPlots(plotIds.map((plotId, index) => ({ id: index, plotId })));
-      nextId.current = plotIds.length;
-    } else {
-      removeAllPlots()
-      // setPlots([])
-      // nextId.current = 0
+      if (plots.length === 0) {
+        const plotIds = plotlistParam.split(",").map((id) => id.trim());
+        setPlots(plotIds.map((plotId, index) => ({ id: index, plotId })));
+        nextId.current = plotIds.length;
+        console.log("batch set Plot", plotIds);
+      }
     }
+    //  else {
+    //   removeAllPlots();
+    //   console.log("batch remove Plot");
+    //   // setPlots([])
+    //   // nextId.current = 0
+    // }
 
     if (x1Param) setX1(x1Param);
     if (x2Param) setX2(x2Param);
@@ -93,8 +104,8 @@ function LTPlotContainer() {
 
   const handleBatchPlotSubmit = (e) => {
     e.preventDefault();
-    handleBatchPlotButton()
-  }
+    handleBatchPlotButton();
+  };
 
   const handleBatchPlotButton = () => {
     const trimmedInput = batchPlotInput.trim();
@@ -119,134 +130,146 @@ function LTPlotContainer() {
   };
 
   return (
-    <div className="pt-5 pb-10">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <button
-            className="btn btn-outline btn-sm"
-            onClick={() => addPlot(nextId.current++)}
-          >
-            Add Plot
-          </button>
-          <button
-            className="btn btn-outline btn-sm"
-            onClick={() => removeAllPlots()}
-          >
-            Remove All
-          </button>
-          <button onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}>
-            {showAdvancedOptions ? (
-              <ChevronsUp className="w-4 h-4" />
-            ) : (
-              <ChevronsDown className="w-4 h-4" />
-            )}
-          </button>
-        </div>
-
-        <div className="flex items-center space-x-2 p-2">
-          <div className="flex items-center space-x-1">
-            <label className="text-gray-700 font-medium">X:</label>
-            <input
-              type="text"
-              value={x1}
-              onChange={(e) => setX1(e.target.value)}
-              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
-            />
-            <input
-              type="text"
-              value={x2}
-              onChange={(e) => setX2(e.target.value)}
-              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
-            />
-          </div>
-          <div className="flex items-center space-x-1">
-            <label className="text-gray-700 font-medium">Y:</label>
-            <input
-              type="text"
-              value={y1}
-              onChange={(e) => setY1(e.target.value)}
-              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
-            />
-            <input
-              type="text"
-              value={y2}
-              onChange={(e) => setY2(e.target.value)}
-              className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
-            />
-          </div>
-        </div>
+    <div>
+      <div className="font-bold text-5xl">
+        <button
+          onClick={handleResetAndNavigate}
+          className="hover:cursor-pointer bg-transparent"
+        >
+          LT View
+        </button>
       </div>
+      <div className="pt-5 pb-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              className="btn btn-outline btn-sm"
+              onClick={() => addPlot(nextId.current++)}
+            >
+              Add Plot
+            </button>
+            <button
+              className="btn btn-outline btn-sm"
+              onClick={() => removeAllPlots()}
+            >
+              Remove All
+            </button>
+            <button
+              onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+            >
+              {showAdvancedOptions ? (
+                <ChevronsUp className="w-4 h-4" />
+              ) : (
+                <ChevronsDown className="w-4 h-4" />
+              )}
+            </button>
+          </div>
 
-      {showAdvancedOptions && (
-        <div className="p-2 border rounded-md mt-2">
-          <div className="flex items-center py-5">
-            <form onSubmit={handleBatchPlotSubmit} className="w-full">
-              <label className="input input-bordered flex items-center gap-2 w-full">
-                Batch Plot
-                <input
-                  type="text"
-                  placeholder="H-072224-1234"
-                  className="grow focus:outline-none focus:ring-0 w-full flex-1"
-                  onChange={handleInputChange_batchPlot}
-                  value={batchPlotInput}
-                />
-                <button
-                  type="submit"
-                  className="btn btn-sm btn-circle btn-outline"
-                  // onClick={handleBatchPlotButton}
-                >
-                  <Search className="w-5 h-5 p-0" />
-                </button>
-              </label>
-            </form>
+          <div className="flex items-center space-x-2 p-2">
+            <div className="flex items-center space-x-1">
+              <label className="text-gray-700 font-medium">X:</label>
+              <input
+                type="text"
+                value={x1}
+                onChange={(e) => setX1(e.target.value)}
+                className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+              />
+              <input
+                type="text"
+                value={x2}
+                onChange={(e) => setX2(e.target.value)}
+                className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+              />
+            </div>
+            <div className="flex items-center space-x-1">
+              <label className="text-gray-700 font-medium">Y:</label>
+              <input
+                type="text"
+                value={y1}
+                onChange={(e) => setY1(e.target.value)}
+                className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+              />
+              <input
+                type="text"
+                value={y2}
+                onChange={(e) => setY2(e.target.value)}
+                className="border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-12"
+              />
+            </div>
           </div>
         </div>
-      )}
 
-      {plots.map(({ id, plotId }) => (
-        <div key={id} style={{ position: "relative", marginBottom: "10px" }}>
-          <LTSinglePlot
-            sampleID_input={plotId}
-            plotRange={{ x1, x2, y1, y2 }}
-            onSampleIDChange={(newSampleID) => updatePlotId(id, newSampleID)}
-          />
+        {showAdvancedOptions && (
+          <div className="p-2 border rounded-md mt-2">
+            <div className="flex items-center py-5">
+              <form onSubmit={handleBatchPlotSubmit} className="w-full">
+                <label className="input input-bordered flex items-center gap-2 w-full">
+                  Batch Plot
+                  <input
+                    type="text"
+                    placeholder="H-072224-1234"
+                    className="grow focus:outline-none focus:ring-0 w-full flex-1"
+                    onChange={handleInputChange_batchPlot}
+                    value={batchPlotInput}
+                  />
+                  <button
+                    type="submit"
+                    className="btn btn-sm btn-circle btn-outline"
+                    // onClick={handleBatchPlotButton}
+                  >
+                    <Search className="w-5 h-5 p-0" />
+                  </button>
+                </label>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {plots.map(({ id, plotId }) => (
+          <div key={id} style={{ position: "relative", marginBottom: "10px" }}>
+            <LTSinglePlot
+              sampleID_input={plotId}
+              plotRange={{ x1, x2, y1, y2 }}
+              onSampleIDChange={(newSampleID) => updatePlotId(id, newSampleID)}
+            />
+            <button
+              onClick={() => removePlot(id)}
+              style={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                backgroundColor: "red",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              X
+            </button>
+          </div>
+        ))}
+        <div className="text-center mt-2">
           <button
-            onClick={() => removePlot(id)}
+            onClick={() => addPlot(nextId.current++)}
             style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              backgroundColor: "red",
+              marginTop: "10px",
+              backgroundColor: "green",
               color: "white",
               border: "none",
-              borderRadius: "50%",
-              width: "24px",
-              height: "24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              borderRadius: "5px",
+              padding: "5px 10px",
               cursor: "pointer",
             }}
           >
-            X
+            +
           </button>
         </div>
-      ))}
-      <div className="text-center mt-2">
-        <button
-          onClick={() => addPlot(nextId.current++)}
-          style={{
-            marginTop: "10px",
-            backgroundColor: "green",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            padding: "5px 10px",
-            cursor: "pointer",
-          }}
-        >
-          +
-        </button>
       </div>
     </div>
   );
@@ -259,6 +282,7 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
   const ltdataStatus = useSelector((state) => state.ltdata.status);
   const ltdataSet = useSelector((state) => state.ltdata.data);
   const [sampleID, setSampleID] = useState(sampleID_input);
+  const [previousID, setPreviousID] = useState("");
   const [plotData, setPlotData] = useState([]);
   const [dataFound, setDataFound] = useState(true);
   const [plotted, setPlotted] = useState(false);
@@ -343,10 +367,11 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
   }, [ltdataSet, sampleID, plotted, plotRange]);
 
   useEffect(() => {
-    if (dataFound === true) {
-      // console.log("update sampleID", sampleID)
+    if (dataFound === true && sampleID !== previousID) {
+      console.log("update sampleID", sampleID);
       onSampleIDChange(sampleID);
     }
+    console.log("no Update", sampleID, previousID);
   }, [dataFound]);
   // console.log("plotData", plotData);
 

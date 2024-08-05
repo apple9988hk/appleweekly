@@ -23,6 +23,19 @@ export const fetchLTData = createAsyncThunk("users/fetchLTData", async (id) => {
   return newdata;
 });
 
+// export const fetchLTData = createAsyncThunk("users/fetchLTData", async (id) => {
+//   let newdata = {};
+//   console.log("fetch", id)
+//   // const snapshot = await axios.get(
+//   //   `http://tmdata.udc.local/api/life/${id}`
+//   // )
+ 
+//   // if (snapshot.status === 200){
+//   //   newdata = snapshot.data
+//   // }
+//   return newdata;
+// });
+
 export const ltdataSlice = createSlice({
   name: "ltdata",
   initialState,
