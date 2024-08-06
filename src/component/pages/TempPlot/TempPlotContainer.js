@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import Plot from 'react-plotly.js';
-import Cookies from 'js-cookie';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import Plot from "react-plotly.js";
+import Cookies from "js-cookie";
+import moment from "moment";
 
 const TempView = () => {
-  const [apiKey, setApiKey] = useState('');
-  const [sampleNo, setSampleNo] = useState('30'); // Default sampleNo to 30
-  const [start, setStart] = useState(moment().subtract(5, 'days').format('YYYY-MM-DDTHH:mm:ss')); // Default start time
-  const [end, setEnd] = useState(moment().format('YYYY-MM-DDTHH:mm:ss')); // Default end time
+  const [apiKey, setApiKey] = useState("");
+  const [sampleNo, setSampleNo] = useState("30"); // Default sampleNo to 30
+  const [start, setStart] = useState(
+    moment().subtract(5, "days").format("YYYY-MM-DDTHH:mm:ss")
+  ); // Default start time
+  const [end, setEnd] = useState(moment().format("YYYY-MM-DDTHH:mm:ss")); // Default end time
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const storedApiKey = Cookies.get('apiKey');
+    const storedApiKey = Cookies.get("apiKey");
     if (storedApiKey) {
       setApiKey(storedApiKey);
     }
@@ -19,7 +21,7 @@ const TempView = () => {
 
   useEffect(() => {
     if (apiKey) {
-      Cookies.set('apiKey', apiKey, {  expires: 365 * 10  });
+      Cookies.set("apiKey", apiKey, { expires: 365 * 10 });
     }
   }, [apiKey]);
 
@@ -30,8 +32,8 @@ const TempView = () => {
 
   const fetchData = async () => {
     try {
-      const formattedStart = moment(start).format('YYYY-MM-DD HH:mm:ss');
-      const formattedEnd = moment(end).format('YYYY-MM-DD HH:mm:ss');
+      const formattedStart = moment(start).format("YYYY-MM-DD HH:mm:ss");
+      const formattedEnd = moment(end).format("YYYY-MM-DD HH:mm:ss");
 
       const url = `https://api.ubibot.cn/channels/22188/feeds?average=${sampleNo}&end=${encodeURIComponent(
         formattedEnd
@@ -41,15 +43,21 @@ const TempView = () => {
 
       const response = await fetch(url);
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
+      if (response.status === 429) {
+        // Handle rate limiting error
+        const errorData = await response.json(); // Assuming JSON response
+        console.error(`Error: ${errorData.errorCode} - ${errorData.desp}`);
+        alert(`Error: ${errorData.desp} (${errorData.errorCode})`);
+      } else if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      } else {
+        // Handle successful response
+        const result = await response.json();
+        setData(result.feeds);
       }
-
-      const result = await response.json();
-      setData(result.feeds);
     } catch (error) {
       console.error(error);
-      alert('Error fetching data');
+      alert("Error fetching data");
     }
   };
 
@@ -104,29 +112,30 @@ const TempView = () => {
             {
               x: data.map((item) => item.created_at),
               y: data.map((item) => item.field7),
-              type: 'scatter',
-              mode: 'lines+markers',
-              marker: { color: 'blue' },
-              name: 'Ext1',
+              type: "scatter",
+              mode: "lines+markers",
+              marker: { color: "blue" },
+              name: "Ext1",
             },
             {
               x: data.map((item) => item.created_at),
               y: data.map((item) => item.field8),
-              type: 'scatter',
-              mode: 'lines+markers',
-              marker: { color: 'red' },
-              name: 'Ext2',
+              type: "scatter",
+              mode: "lines+markers",
+              marker: { color: "red" },
+              name: "Ext2",
             },
           ]}
           layout={{
             autosize: true,
             height: 600,
-            title: 'Data Plot for Ext1 and Ext2',
+            title: "Data Plot for Ext1 and Ext2",
             margin: { t: 50, r: 150 },
             modebar: {
-                orientation: "v"},
+              orientation: "v",
+            },
           }}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: "100%", height: "100%" }}
           useResizeHandler={true}
         />
       )}
