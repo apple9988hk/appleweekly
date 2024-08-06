@@ -20,6 +20,7 @@ import Parking from "./component/pages/Parking/Parking"
 import Short from "./component/pages/Short/Short2"
 import OJData from "./component/pages/OJData/OJData"
 import JVLData  from "./component/pages/JVLData/JVLData.js";
+import TempView  from "./component/pages/TempPlot/TempView.js";
 
 
 const initialState = {
@@ -180,6 +181,7 @@ const App = () => {
         <Route path="Short" element={<Short/>} />
         <Route path="ojdata" element={<OJData/>} />
         <Route path="jvldata" element={<JVLData/>} />
+        <Route path="Temp" element={<TempView/>} />
 
       </Routes>
     </BrowserRouter>
