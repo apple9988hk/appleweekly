@@ -128,6 +128,43 @@ function ActiveISummary() {
 
   }
 
+  
+  async function createShortCut(event) {
+    event.preventDefault();
+    console.log(selectedFiles)
+    const id = toast.loading("Creating Short Cut")
+    if (selectedFiles.length === 0){
+      toast.update(id, { render:"No file selected", type: "error", isLoading: false, autoClose: 5000})
+      return 
+    } else {
+      fetch("http://127.0.0.1:5005/create_short_cut/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          selectedFiles.map((d, index) => {
+            return { name: data[d].name };
+          })
+        ),
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          toast.error("Create short cut Failed");
+          throw new Error("Create short cut Failed");
+        }
+      })
+      .then((data)=> {
+        toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
+        console.log(data)
+      })
+
+    }
+
+  }
+
   return (
     <>
       <ToastContainer position="bottom-right" />
@@ -160,6 +197,9 @@ function ActiveISummary() {
           Copy to local
         </button>
         <button className="btn"> Open Selected Files</button>
+        <button className="btn" onClick={createShortCut}>
+          Create ShortCut
+        </button>
         <button className="btn" onClick={fetchActiveISum}>
           {" "}
           Refresh

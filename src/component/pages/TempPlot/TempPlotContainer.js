@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Plot from "react-plotly.js";
-import Cookies from "js-cookie";
 import moment from "moment";
+import Cookies from "js-cookie";
+// import Highcharts from 'highcharts';
+// import HighchartsReact from 'highcharts-react-official';
+import ReactECharts from "echarts-for-react";
+// import moment from 'moment-timezone';
 
 const TempView = () => {
   const [apiKey, setApiKey] = useState("");
@@ -41,7 +44,11 @@ const TempView = () => {
         formattedStart
       )}&timezone=Asia%2FHong_Kong&token_id=${apiKey}`;
 
+      // console.log(url)
+
       const response = await fetch(url);
+
+      console.log(response);
 
       if (response.status === 429) {
         // Handle rate limiting error
@@ -60,6 +67,182 @@ const TempView = () => {
       alert("Error fetching data");
     }
   };
+
+  const getChartOptions = () => ({
+    title: {
+      text: "Data Plot for Ext1, Ext2, and Humidity",
+      left: "center"
+    },
+    grid: {
+      bottom: 80,
+      top: 80
+    },
+    toolbox: {
+      feature: {
+        dataZoom: {
+          yAxisIndex: 'none'
+        },
+        restore: {},
+        saveAsImage: {}
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        animation: false,
+        label: {
+          backgroundColor: '#505765'
+        }
+      }
+    },
+    legend: {
+      data: ["Ext1", "Ext2"],
+      top: 40,
+    },
+    dataZoom: [
+      {
+        show: true,
+        realtime: true,
+        start: 1,
+        end: 100
+      },
+      {
+        type: 'inside',
+        realtime: true,
+        start: 1,
+        end: 100
+      }
+    ],
+    xAxis: {
+      type: "time",
+      axisLine: { onZero: true },
+      axisLabel: {
+        formatter: "{yyyy}-{MM}-{dd}\n{hh}:{mm}",
+      },
+    },
+    yAxis: [
+      {
+        type: "value",
+        name: "Temperature (°C)",
+        scale: true
+      }
+    ],
+    dataZoom: [
+      {
+        type: "slider",
+        start: 0,
+        end: 100,
+      },
+      {
+        type: "inside",
+        start: 0,
+        end: 100,
+      },
+    ],
+    series: data
+      ? [
+          {
+            name: "Ext1",
+            type: "line",
+            data: data.map((item) => {
+              const utcTimestamp = new Date(item.created_at).getTime();
+              const hongKongTimestamp = utcTimestamp + 8 * 60 * 60 * 1000;
+              return [hongKongTimestamp, parseFloat(item.field7)];
+            }),
+            lineStyle: {
+              width: 2,
+            },
+            symbol: "circle",
+            symbolSize: 6,
+          },
+          {
+            name: "Ext2",
+            type: "line",
+            data: data.map((item) => {
+              const utcTimestamp = new Date(item.created_at).getTime();
+              const hongKongTimestamp = utcTimestamp + 8 * 60 * 60 * 1000;
+              return [hongKongTimestamp, parseFloat(item.field8)];
+            }),
+            lineStyle: {
+              width: 2,
+            },
+            symbol: "circle",
+            symbolSize: 6,
+          },
+        ]
+      : [],
+  });
+
+  // const chartOptions = {
+  //   chart:{
+  //     type: 'line'
+  //   },
+  //   title: {
+  //     text: 'Data Plot for Ext1 and Ext2'
+  //   },
+  //   xAxis: {
+  //     type: 'datetime',
+  //     title: {
+  //       text: 'Date'
+  //     }
+  //   },
+  //   yAxis: [
+  //     {
+  //       title: {
+  //         text: 'Temperature (°C)'
+  //       },
+  //     },
+  //     {
+  //       title: {
+  //         text: 'Humidity (%RH)'
+  //       },
+  //       opposite: true // Display the second y-axis on the right
+  //     }
+  //   ],
+  //   rangeSelector: {
+  //     enabled: true, // Enables the range selector
+  //     selected: 1 // Default to the second option (e.g., 1 month)
+  //   },
+  //   series: data ? [
+  //     {
+  //       name: 'Ext1',
+  //       data: data.map(item => {
+  //         const utcTimestamp = new Date(item.created_at).getTime();
+  //         const hongKongTimestamp = utcTimestamp + (8 * 60 * 60 * 1000);
+  //         return [hongKongTimestamp, parseFloat(item.field7)];
+  //       }),
+  //       // data: data.map(item => [moment.tz(item.created_at, 'Asia/Hong_Kong').valueOf(), parseFloat(item.field7)]),
+  //       color: 'blue',
+  //       yAxis: 0 // Use the first y-axis
+  //     },
+  //     {
+  //       name: 'Ext2',
+  //       data: data.map(item => {
+  //         const utcTimestamp = new Date(item.created_at).getTime();
+  //         const hongKongTimestamp = utcTimestamp + (8 * 60 * 60 * 1000);
+  //         return [hongKongTimestamp, parseFloat(item.field8)];
+  //       }),
+  //       // data: data.map(item => [moment.tz(item.created_at, 'Asia/Hong_Kong').valueOf(), parseFloat(item.field8)]),
+  //       color: 'red',
+  //       yAxis: 0 // Use the first y-axis
+  //     },
+  //     {
+  //       name: 'Humidity',
+  //       data: data.map(item => {
+  //         const utcTimestamp = new Date(item.created_at).getTime();
+  //         const hongKongTimestamp = utcTimestamp + (8 * 60 * 60 * 1000);
+  //         return [hongKongTimestamp, parseFloat(item.field2)];
+  //       }),
+  //       // data: data.map(item => [moment.tz(item.created_at, 'Asia/Hong_Kong').valueOf(), parseFloat(item.field2)]),
+  //       color: 'green',
+  //       yAxis: 1, // Use the second y-axis
+  //       visible: false
+  //     }
+  //   ] : []
+  // };
+
+  // console.log(chartOptions.series)
 
   return (
     <div className="p-6 max-w-7xl mx-auto shadow-md space-y-4">
@@ -107,36 +290,9 @@ const TempView = () => {
         </div>
       </div>
       {data && (
-        <Plot
-          data={[
-            {
-              x: data.map((item) => item.created_at),
-              y: data.map((item) => item.field7),
-              type: "scatter",
-              mode: "lines+markers",
-              marker: { color: "blue" },
-              name: "Ext1",
-            },
-            {
-              x: data.map((item) => item.created_at),
-              y: data.map((item) => item.field8),
-              type: "scatter",
-              mode: "lines+markers",
-              marker: { color: "red" },
-              name: "Ext2",
-            },
-          ]}
-          layout={{
-            autosize: true,
-            height: 600,
-            title: "Data Plot for Ext1 and Ext2",
-            margin: { t: 50, r: 150 },
-            modebar: {
-              orientation: "v",
-            },
-          }}
-          style={{ width: "100%", height: "100%" }}
-          useResizeHandler={true}
+        <ReactECharts
+          option={getChartOptions()}
+          style={{ height: "600px", width: "100%" }}
         />
       )}
     </div>

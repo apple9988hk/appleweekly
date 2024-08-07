@@ -72,9 +72,61 @@ function ActiveMaster() {
         toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
         console.log(data)
       })
-
     }
+  }
 
+  async function openFolder(event) {
+    event.preventDefault();
+    console.log(selectedFiles)
+    const id = toast.loading("Opening Folder")
+    if (selectedFiles.length === 0){
+      toast.update(id, { render:"No file selected", type: "error", isLoading: false, autoClose: 5000})
+      return 
+    } else {
+      fetch("http://127.0.0.1:5005/open_folder/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          selectedFiles.map((d, index) => {
+            return { name: data[d].path };
+          })
+        ),
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          toast.error("Open Folder Failed");
+          throw new Error("Open Folder Failed");
+        }
+      })
+      .then((data)=> {
+        toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
+        console.log(data)
+      })
+    }
+  }
+
+  async function openLifeFolder() {
+    const id = toast.loading("Opening Life Folder")
+    fetch("http://127.0.0.1:5005/open_Life_Folder/")
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          toast.error("Open Folder Failed");
+          throw new Error("Failed to open life folder");
+        }
+      })
+      .then((data) => {
+        toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Open Folder Failed");
+      });
   }
 
   console.log(data)
@@ -104,6 +156,12 @@ function ActiveMaster() {
       <div className="flex w-full justify-between" >
         <button className="btn" onClick={openMaster}>
           Open Master
+        </button>
+        <button className="btn" onClick={openFolder}>
+          Open Folder
+        </button>
+        <button className="btn" onClick={openLifeFolder}>
+          Open Life
         </button>
         <button className="btn" onClick={fetchMaster}>
           {" "}
