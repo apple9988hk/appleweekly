@@ -70,7 +70,7 @@ const TempView = () => {
 
   const getChartOptions = () => ({
     title: {
-      text: "Data Plot for Ext1, Ext2, and Humidity",
+      text: "Data Plot for Ext1 and Ext2",
       left: "center"
     },
     grid: {

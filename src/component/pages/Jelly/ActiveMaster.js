@@ -43,11 +43,16 @@ function ActiveMaster() {
 
   async function openMaster(event) {
     event.preventDefault();
-    console.log(selectedFiles)
-    const id = toast.loading("Start Opening")
-    if (selectedFiles.length === 0){
-      toast.update(id, { render:"No file selected", type: "error", isLoading: false, autoClose: 5000})
-      return 
+    console.log(selectedFiles);
+    const id = toast.loading("Start Opening");
+    if (selectedFiles.length === 0) {
+      toast.update(id, {
+        render: "No file selected",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+      return;
     } else {
       fetch("http://127.0.0.1:5005/open_master/", {
         method: "POST",
@@ -60,28 +65,38 @@ function ActiveMaster() {
           })
         ),
       })
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          toast.error("Copy to Local Failed");
-          throw new Error("Failed to fetch data");
-        }
-      })
-      .then((data)=> {
-        toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
-        console.log(data)
-      })
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            toast.error("Copy to Local Failed");
+            throw new Error("Failed to fetch data");
+          }
+        })
+        .then((data) => {
+          toast.update(id, {
+            render: `${data["message"]}`,
+            type: "success",
+            isLoading: false,
+            autoClose: 5000,
+          });
+          console.log(data);
+        });
     }
   }
 
   async function openFolder(event) {
     event.preventDefault();
-    console.log(selectedFiles)
-    const id = toast.loading("Opening Folder")
-    if (selectedFiles.length === 0){
-      toast.update(id, { render:"No file selected", type: "error", isLoading: false, autoClose: 5000})
-      return 
+    console.log(selectedFiles);
+    const id = toast.loading("Opening Folder");
+    if (selectedFiles.length === 0) {
+      toast.update(id, {
+        render: "No file selected",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+      return;
     } else {
       fetch("http://127.0.0.1:5005/open_folder/", {
         method: "POST",
@@ -94,23 +109,28 @@ function ActiveMaster() {
           })
         ),
       })
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          toast.error("Open Folder Failed");
-          throw new Error("Open Folder Failed");
-        }
-      })
-      .then((data)=> {
-        toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
-        console.log(data)
-      })
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            toast.error("Open Folder Failed");
+            throw new Error("Open Folder Failed");
+          }
+        })
+        .then((data) => {
+          toast.update(id, {
+            render: `${data["message"]}`,
+            type: "success",
+            isLoading: false,
+            autoClose: 5000,
+          });
+          console.log(data);
+        });
     }
   }
 
   async function openLifeFolder() {
-    const id = toast.loading("Opening Life Folder")
+    const id = toast.loading("Opening Life Folder");
     fetch("http://127.0.0.1:5005/open_Life_Folder/")
       .then((response) => {
         if (response.status === 200) {
@@ -121,7 +141,12 @@ function ActiveMaster() {
         }
       })
       .then((data) => {
-        toast.update(id, { render: `${data['message']}`, type: "success", isLoading: false, autoClose: 5000 });
+        toast.update(id, {
+          render: `${data["message"]}`,
+          type: "success",
+          isLoading: false,
+          autoClose: 5000,
+        });
       })
       .catch((error) => {
         console.error(error);
@@ -129,11 +154,11 @@ function ActiveMaster() {
       });
   }
 
-  console.log(data)
+  console.log(data);
   return (
     <>
       <ToastContainer position="bottom-right" />
-      <div className ="font-bold text-xl">Active Master</div>
+      <div className="font-bold text-xl">Active Master</div>
 
       {/* Filter */}
       <div className="p-2">
@@ -153,7 +178,7 @@ function ActiveMaster() {
       </div>
 
       {/* <div className="p-2 flex flex-col  justify-between gap-2"> */}
-      <div className="flex w-full justify-between" >
+      <div className="flex w-full justify-between">
         <button className="btn" onClick={openMaster}>
           Open Master
         </button>
@@ -168,95 +193,108 @@ function ActiveMaster() {
           Refresh
         </button>
       </div>
-
     </>
   );
 }
 
-
 function ActiveISumTable(props) {
-    const { data, handleSelectedFiles } = props;
-    const [selectedRows, setSelectedRows] = useState([]);
-    const [checkAll, setCheckAll] = useState(false);
-    const handleRowClick = (e) => {
-      let row = e.target.value;
-      const selectedIndex = selectedRows.indexOf(row);
-      if (selectedIndex === -1) {
-        // If not, add the row to the selectedRows array
-        setSelectedRows([...selectedRows, row]);
-        handleSelectedFiles([...selectedRows, row]);
-      } else {
-        // If yes, remove the row from the selectedRows array
-        const newSelectedRows = [...selectedRows];
-        newSelectedRows.splice(selectedIndex, 1);
-        setSelectedRows(newSelectedRows);
-        handleSelectedFiles(newSelectedRows);
-      }
-    };
-  
-    const handleCheckAll = () => {
-      // console.log("first");
-      setCheckAll(!checkAll);
-      if (!checkAll) {
-        setSelectedRows(data.map((d, index) => index.toString()));
-        handleSelectedFiles(data.map((d, index) => index.toString()));
-      } else {
-        setSelectedRows([]);
-        handleSelectedFiles([]);
-      }
-      // setTableData(tableData.map(item => ({ ...item, isChecked: !isChecked })));
-    };
-    // console.log(selectedRows);
-  
-    const isRowSelected = (rowIndex) => {
-      // Check if the index is in the selectedRows array
-      return selectedRows.indexOf(rowIndex.toString()) !== -1;
-    };
-  
-    return (
-      <div className="overflow-x-auto w-full">
-        <table className="table table-compact w-full">
-          {/* head */}
-          <thead>
+  const { data, handleSelectedFiles } = props;
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [checkAll, setCheckAll] = useState(false);
+  const [showAllEntries, setShowAllEntries] = useState(false);
+
+  const handleRowClick = (e) => {
+    let row = e.target.value;
+    const selectedIndex = selectedRows.indexOf(row);
+    if (selectedIndex === -1) {
+      // If not, add the row to the selectedRows array
+      setSelectedRows([...selectedRows, row]);
+      handleSelectedFiles([...selectedRows, row]);
+    } else {
+      // If yes, remove the row from the selectedRows array
+      const newSelectedRows = [...selectedRows];
+      newSelectedRows.splice(selectedIndex, 1);
+      setSelectedRows(newSelectedRows);
+      handleSelectedFiles(newSelectedRows);
+    }
+  };
+
+  const handleShowAllToggle = () => {
+    setShowAllEntries(!showAllEntries);
+  };
+
+  const entriesToShow = showAllEntries ? data : data.slice(0, 5);
+
+  const handleCheckAll = () => {
+    // console.log("first");
+    setCheckAll(!checkAll);
+    if (!checkAll) {
+      setSelectedRows(data.map((d, index) => index.toString()));
+      handleSelectedFiles(data.map((d, index) => index.toString()));
+    } else {
+      setSelectedRows([]);
+      handleSelectedFiles([]);
+    }
+    // setTableData(tableData.map(item => ({ ...item, isChecked: !isChecked })));
+  };
+  // console.log(selectedRows);
+
+  const isRowSelected = (rowIndex) => {
+    // Check if the index is in the selectedRows array
+    return selectedRows.indexOf(rowIndex.toString()) !== -1;
+  };
+
+  return (
+    <div className="overflow-x-auto w-full">
+      <div className="flex justify-end mb-2">
+        <button
+          className="btn btn-xs bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
+          onClick={handleShowAllToggle}
+        >
+          {showAllEntries ? "Show Less" : "Show All"}
+        </button>
+      </div>
+      <table className="table table-compact w-full">
+        {/* head */}
+        <thead>
+          <tr>
+            <th>
+              <label>
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={checkAll}
+                  onChange={handleCheckAll}
+                />
+              </label>
+            </th>
+            <th>name</th>
+            <th>path</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entriesToShow.map((item, index) => (
             <tr>
               <th>
                 <label>
                   <input
                     type="checkbox"
+                    id={index}
+                    value={index}
                     className="checkbox"
-                    checked={checkAll}
-                    onChange={handleCheckAll}
+                    checked={isRowSelected(index)}
+                    onChange={handleRowClick}
                   />
                 </label>
               </th>
-              <th>name</th>
-              <th>path</th>
+              <td>{item.name}</td>
+              <td>{item.path}</td>
             </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr>
-                <th>
-                  <label>
-                    <input
-                      type="checkbox"
-                      id={index}
-                      value={index}
-                      className="checkbox"
-                      checked={isRowSelected(index)}
-                      onChange={handleRowClick}
-                    />
-                  </label>
-                </th>
-                <td>{item.name}</td>
-                <td>{item.path}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-  
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default ActiveMaster;
