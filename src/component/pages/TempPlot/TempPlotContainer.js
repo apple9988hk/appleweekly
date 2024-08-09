@@ -35,16 +35,28 @@ const TempView = () => {
 
   const fetchData = async () => {
     try {
-      const formattedStart = moment(start).format("YYYY-MM-DD HH:mm:ss");
-      const formattedEnd = moment(end).format("YYYY-MM-DD HH:mm:ss");
+      // const formattedStart = moment(start).format("YYYY-MM-DD HH:mm:ss");
+      // const formattedEnd = moment(end).format("YYYY-MM-DD HH:mm:ss");
 
-      const url = `https://api.ubibot.cn/channels/22188/feeds?average=${sampleNo}&end=${encodeURIComponent(
-        formattedEnd
-      )}&start=${encodeURIComponent(
-        formattedStart
-      )}&timezone=Asia%2FHong_Kong&token_id=${apiKey}`;
+      const formattedStart = moment(start).format("YYYY-MM-DD+HH:mm:ss");
+      const formattedEnd = moment(end).format("YYYY-MM-DD+HH:mm:ss");
+  
+      const url = `https://api.ubibot.cn/channels/22188/feeds?average=${sampleNo}&end=${formattedEnd}&start=${formattedStart}&timezone=Asia%2FHong_Kong&token_id=${apiKey}`;
+  
+      // const url = `https://api.ubibot.cn/channels/22188/feeds?average=${sampleNo}&end=${encodeURIComponent(
+      //   formattedEnd
+      // )}&start=${encodeURIComponent(
+      //   formattedStart
+      // )}&timezone=Asia%2FHong_Kong&token_id=${apiKey}`;
 
-      // console.log(url)
+      // const url = `https://api.ubibot.cn/channels/22188/feeds?average=${sampleNo}&end=${encodeURIComponent(
+      //   formattedEnd.replace(/ /g, '+')
+      // )}&start=${encodeURIComponent(
+      //   formattedStart.replace(/ /g, '+')
+      // )}&timezone=Asia%2FHong_Kong&token_id=${apiKey}`;
+      // const url = `https://api.ubibot.cn/channels/22188/feeds?average=30&end=2024-08-09+16:15:59&start=2024-08-08+16:15:40&timezone=Asia%2FHong_Kong&token_id=${apiKey}`
+   
+      console.log("url",url)
 
       const response = await fetch(url);
 
