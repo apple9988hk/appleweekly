@@ -39,9 +39,10 @@ const TempView = () => {
       // const formattedEnd = moment(end).format("YYYY-MM-DD HH:mm:ss");
 
       const formattedStart = moment(start).format("YYYY-MM-DD+HH:mm:ss");
-      const formattedEnd = moment(end).format("YYYY-MM-DD+HH:mm:ss");
+      // const formattedEnd = moment(end).format("YYYY-MM-DD+HH:mm:ss");
+      const formattedEnd = moment(end).format("YYYY-MM-DD+");
   
-      const url = `https://api.ubibot.cn/channels/22188/feeds?average=${sampleNo}&end=${formattedEnd}&start=${formattedStart}&timezone=Asia%2FHong_Kong&token_id=${apiKey}`;
+      const url = `https://api.ubibot.cn/channels/22188/summary?average=${sampleNo}&end=${formattedEnd}23:59:59&start=${formattedStart}&timezone=Asia%2FHong_Kong&token_id=${apiKey}`;
   
       // const url = `https://api.ubibot.cn/channels/22188/feeds?average=${sampleNo}&end=${encodeURIComponent(
       //   formattedEnd
@@ -157,11 +158,18 @@ const TempView = () => {
           {
             name: "Ext1",
             type: "line",
+            // data: data.map((item) => {
+            //   const utcTimestamp = new Date(item.created_at).getTime();
+            //   const hongKongTimestamp = utcTimestamp + 8 * 60 * 60 * 1000;
+            //   return [hongKongTimestamp, parseFloat(item.field7.avg)];
+            // }),
             data: data.map((item) => {
               const utcTimestamp = new Date(item.created_at).getTime();
-              const hongKongTimestamp = utcTimestamp + 8 * 60 * 60 * 1000;
-              return [hongKongTimestamp, parseFloat(item.field7)];
-            }),
+              const hongKongTimestamp = utcTimestamp + 0 * 60 * 60 * 1000;
+              // Check if item.field7 and item.field7.avg exist before parsing
+              const avgValue = item.field7 && item.field7.avg ? parseFloat(item.field7.avg) : null;
+              return [hongKongTimestamp, avgValue];
+            }).filter(([_, avgValue]) => avgValue !== null),
             lineStyle: {
               width: 2,
             },
@@ -171,11 +179,18 @@ const TempView = () => {
           {
             name: "Ext2",
             type: "line",
+            // data: data.map((item) => {
+            //   const utcTimestamp = new Date(item.created_at).getTime();
+            //   const hongKongTimestamp = utcTimestamp + 8 * 60 * 60 * 1000;
+            //   return [hongKongTimestamp, parseFloat(item.field8.avg)];
+            // }),
             data: data.map((item) => {
               const utcTimestamp = new Date(item.created_at).getTime();
-              const hongKongTimestamp = utcTimestamp + 8 * 60 * 60 * 1000;
-              return [hongKongTimestamp, parseFloat(item.field8)];
-            }),
+              const hongKongTimestamp = utcTimestamp + 0 * 60 * 60 * 1000;
+              // Check if item.field8 and item.field8.avg exist before parsing
+              const avgValue = item.field8 && item.field8.avg ? parseFloat(item.field8.avg) : null;
+              return [hongKongTimestamp, avgValue];
+            }).filter(([_, avgValue]) => avgValue !== null), 
             lineStyle: {
               width: 2,
             },
