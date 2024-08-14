@@ -1,7 +1,8 @@
 import React from 'react'
 import ActiveISummary from "./ActiveISummary"
-import ISumOperator from "./ISumOperator"
+// import ISumOperator from "./ISumOperator"
 import ActiveMaster from './ActiveMaster'
+import ExpCondition from './ExpCondition'
 
 function Dashboard() {
   return (
@@ -12,7 +13,8 @@ function Dashboard() {
         <div className="divider" />
         <ActiveISummary />
         <div className="divider" />
-        <ISumOperator />
+        <ExpCondition />
+        {/* <ISumOperator /> */}
     </>
 
   )
