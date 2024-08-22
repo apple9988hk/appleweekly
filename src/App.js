@@ -10,6 +10,7 @@ import JImage from "./component/pages/JImage/JImage"
 import Exp from "./component/pages/Exp/Exp"
 import RecentPlate from "./component/pages/RecentPlate/RecentPlate"
 import LTView from "./component/pages/LT/LTView.js"
+import LTView2 from "./component/pages/LT2/LTView.js"
 import LEPlot from "./component/pages/LEPlot/LEPlot"
 import TableTest from "./component/pages/TableTest/TableTest21"
 import Jelly from "./component/pages/Jelly/Jelly"
@@ -173,6 +174,7 @@ const App = () => {
         <Route path="exp" element={<Exp/>} />
         <Route path="recentplate" element={<RecentPlate/>} />
         <Route path="LT" element={<LTView/>} />
+        <Route path="LT2" element={<LTView2/>} />
         <Route path="TableTest" element={<TableTest/>} />
         <Route path="Jelly" element={<Jelly/>} />
         <Route path="formTest" element={<FormTest/>} />
