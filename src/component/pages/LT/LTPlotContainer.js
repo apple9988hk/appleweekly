@@ -335,10 +335,21 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
 
       const processedCouponData = processData(filteredData);
 
+      // const processedData = processedCouponData.map((couponInfo) => {
+      //   const entry = filteredData.find(
+      //     (item) => item.key.charAt(11) === couponInfo.couponID
+      //   );
+      //   const sampleID = entry.key;
+      //   const group = entry.data;
+      //   const divisor = group[0].Luminance;
+      //   const x = group.map((item) => item.TimeInHours);
+      //   const y = group.map((item) => item.Luminance / divisor);
       const processedData = processedCouponData.map((couponInfo) => {
-        const entry = filteredData.find(
-          (item) => item.key.charAt(11) === couponInfo.couponID
+        console.log("couponInfo",couponInfo)
+        const entry = filteredData.find((item) =>
+          item.key.includes(`-${couponInfo.couponID}d${couponInfo.pixelID}`)
         );
+        console.log(entry)
         const sampleID = entry.key;
         const group = entry.data;
         const divisor = group[0].Luminance;

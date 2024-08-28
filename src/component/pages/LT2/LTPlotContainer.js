@@ -690,10 +690,14 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
 
       const processedCouponData = processData(filteredData);
 
+      // console.log(processedCouponData)
+
       const processedData = processedCouponData.map((couponInfo) => {
+        // console.log("couponInfo",couponInfo)
         const entry = filteredData.find((item) =>
-          item.key.includes(`-${couponInfo.couponID}`)
+          item.key.includes(`-${couponInfo.couponID}d${couponInfo.pixelID}`)
         );
+        // console.log(entry)
         const sampleID = entry.key;
         const group = entry.data;
         const divisor = group[0].Luminance;
