@@ -390,11 +390,14 @@ const LTExpPlot = ({
   const [expTitle, setExpTitle] = useState("");
   const [dataFound, setDataFound] = useState(true);
   const [plotted, setPlotted] = useState(false);
+  const [isFetched, setIsFetched] = useState(false);
 
   useEffect(() => {
     console.log("**********************init Exp plot view");
     if (plotsInput) {
       setPreviousPlot(plotsInput);
+      console.log("Set IsFetch = false")
+      setIsFetched(false)
     } else {
       setPreviousPlot([]);
     }
@@ -486,8 +489,9 @@ const LTExpPlot = ({
         })
         .flat(); // Flatten the array since map returns an array of arrays
 
-      setPlotData(prcoessedData);
+      setPlotData(prcoessedData.filter(item => item !== null));
       setDataFound(true);
+      // console.log("setPlotData", prcoessedData)
     }
   }, [ltdataSet, plotsInput]);
 
@@ -499,7 +503,7 @@ const LTExpPlot = ({
   const addLTData = useCallback(
     (id) => {
       dispatch(fetchLTData(id));
-      setPlotted(false);
+      // setPlotted(false);
     },
     [dispatch]
   );
@@ -511,12 +515,15 @@ const LTExpPlot = ({
         return o.key.startsWith(sampleID);
       });
 
-      if (sampleID !== "" && sampleID.length === 10 && !isLtExists) {
+      if (sampleID !== "" && sampleID.length === 10 && !isLtExists && !isFetched) {
         // Fetch LT data for the sampleID
         addLTData(sampleID);
       }
+
+      setIsFetched(true)
     });
-  }, [plotsInput, ltdataSet, addLTData]);
+
+  }, [plotsInput, ltdataSet, addLTData, isFetched]);
 
   return (
     <div>
