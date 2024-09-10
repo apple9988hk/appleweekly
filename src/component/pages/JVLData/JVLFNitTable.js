@@ -16,7 +16,7 @@ function JVLFNitTable() {
     return o.SampleID.slice(0, 10) === watchList[watchList.length - 1];
   });
   const [inputNit, setInputNit] = useState("");
-  console.log(jvldata.length > 0)
+  console.log(jvldata.length > 0);
 
   return (
     <div>
@@ -36,7 +36,9 @@ function JVLFNitTable() {
           data={jvldata}
           runID={watchList[watchList.length - 1]}
         />
-      ) : <h2> Input Nit to calculate LT CD</h2>}
+      ) : (
+        <h2> Input Nit to calculate LT CD</h2>
+      )}
     </div>
   );
 }
@@ -71,7 +73,7 @@ function CDatNit(props) {
   // console.log(data);
   //   console.log(data);
   const newdata = data.map(function (d) {
-    console.log(d)
+    console.log(d);
     try {
       let a = _.findLast(d.JVLForwardDetail, function (n) {
         return n["Luminance"] <= nit;
@@ -87,14 +89,14 @@ function CDatNit(props) {
         cd:
           a.CurrentDensity +
           (nit - a.Luminance) *
-            ((b.CurrentDensity - a.CurrentDensity) / (b.Luminance - a.Luminance)),
-        cie_x: d.Cie_x,
-        cie_y: d.Cie_y,
-      }; 
+            ((b.CurrentDensity - a.CurrentDensity) /
+              (b.Luminance - a.Luminance)),
+        cie_x: d.Cie_x ? d.Cie_x : null,
+        cie_y: d.Cie_y ? d.Cie_y : null,
+      };
     } catch (error) {
       console.error("Error in mapping function:", error);
     }
-
   });
 
   console.log(newdata);
@@ -123,7 +125,7 @@ function JVLFData(props) {
         <tbody>
           {data.map(function (d) {
             return (
-              <tr>
+              <tr key={d.SampleID}>
                 <td>
                   <div className="flex items-center space-x-3">
                     {d.SampleID}
@@ -176,8 +178,10 @@ function JVLFData2(props) {
       : null;
     for (let j = 0; j < dotList.length; j++) {
       let d = dotList[j];
-      let matchingData = _.filter(data, { SampleID: runID + "-" + c + "d" + d });
-  
+      let matchingData = _.filter(data, {
+        SampleID: runID + "-" + c + "d" + d,
+      });
+
       if (matchingData.length > 0) {
         // Access the cd property if the dot exists
         let cd = matchingData[0].cd;
@@ -213,7 +217,7 @@ function JVLFData2(props) {
     resArray.push(buffer);
   }
 
-//   console.log(resArray);
+  //   console.log(resArray);
 
   //   const tableComponent = ["1", "2", "3","4","5","6","7","8","9"].map(function (c) {
   //     // console.log(c)
@@ -281,10 +285,16 @@ function JVLFData2(props) {
         <tbody>
           {resArray.map(function (d) {
             return (
-              <tr >
+              <tr>
                 <td>{d.SampleID}</td>
                 <td>{d.cie_x}</td>
-                <td className={`${d.cie_y >=0.04 && d.cie_y<0.06 ? 'bg-yellow-200' : null}`}>{d.cie_y}</td>
+                <td
+                  className={`${
+                    d.cie_y >= 0.04 && d.cie_y < 0.06 ? "bg-yellow-200" : null
+                  }`}
+                >
+                  {d.cie_y}
+                </td>
                 <td>{d.d1}</td>
                 <td>{d.d2}</td>
                 <td>{d.d3}</td>

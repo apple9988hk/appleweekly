@@ -33,15 +33,16 @@ function RecentJVL() {
       });
   }
 
-  useEffect(() => {
-    fetchMaster();
-  }, []);
+  // useEffect(() => {
+  //   fetchMaster();
+  // }, []);
 
   return (
     <>
       <ToastContainer position="bottom-right" />
       <div className="flex justify-between items-center mb-4">
-        <div className="font-bold text-xl">Recent JVL</div>
+        <h1 className="text-2xl font-bold">Recent JVL</h1>
+        {/* <div className="font-bold text-xl">Recent JVL</div> */}
         <button
           onClick={fetchMaster}
           className="btn btn-primary btn-sm"
