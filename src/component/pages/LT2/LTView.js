@@ -2,10 +2,14 @@ import FetchLT from "./FetchLT";
 import FetchLTDisplay from "./FetchLTDisplay";
 import LTPlotSingle from "./LTPlotSingle";
 import LTPlotContainer from "./LTPlotContainer";
+import { Helmet } from "react-helmet";
 
 function LTView() {
   return (
     <div className="max-w-7xl mx-auto px-5">
+      <Helmet>
+        <title>LT View</title>
+      </Helmet>
       {/* <a href="/appleweekly/LT">
         <span className="sr-only">Your Company</span>
         <img

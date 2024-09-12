@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import RecentJVL from "../Jelly/RecentJVL";
 import debounce from "lodash/debounce";
+import { Helmet } from "react-helmet";
 
 function InstaView() {
   return (
     <>
+      <Helmet>
+        <title>InstaView</title>
+      </Helmet>
       <h1 className="text-3xl font-bold mb-4 text-center">InstaView</h1>
       <div className="px-4 py-4">
         <RecentJVL />
