@@ -73,7 +73,7 @@ function CDatNit(props) {
   // console.log(data);
   //   console.log(data);
   const newdata = data.map(function (d) {
-    console.log(d);
+    // console.log(d);
     try {
       let a = _.findLast(d.JVLForwardDetail, function (n) {
         return n["Luminance"] <= nit;
@@ -156,26 +156,27 @@ function JVLFData2(props) {
     const c = couponList[i];
     let buffer = {};
     buffer["SampleID"] = runID + "-" + c;
-    buffer["cie_x"] = _.filter(data, { SampleID: runID + "-" + c + "d4" })[0]
-      .cie_x
-      ? _.filter(data, { SampleID: runID + "-" + c + "d4" })[0].cie_x
-      : _.filter(data, { SampleID: runID + "-" + c + "d3" })[0].cie_x
-      ? _.filter(data, { SampleID: runID + "-" + c + "d3" })[0].cie_x
-      : _.filter(data, { SampleID: runID + "-" + c + "d2" })[0].cie_x
-      ? _.filter(data, { SampleID: runID + "-" + c + "d2" })[0].cie_x
-      : _.filter(data, { SampleID: runID + "-" + c + "d1" })[0].cie_x
-      ? _.filter(data, { SampleID: runID + "-" + c + "d1" })[0].cie_x
-      : null;
-    buffer["cie_y"] = _.filter(data, { SampleID: runID + "-" + c + "d4" })[0]
-      .cie_y
-      ? _.filter(data, { SampleID: runID + "-" + c + "d4" })[0].cie_y
-      : _.filter(data, { SampleID: runID + "-" + c + "d3" })[0].cie_y
-      ? _.filter(data, { SampleID: runID + "-" + c + "d3" })[0].cie_y
-      : _.filter(data, { SampleID: runID + "-" + c + "d2" })[0].cie_y
-      ? _.filter(data, { SampleID: runID + "-" + c + "d2" })[0].cie_y
-      : _.filter(data, { SampleID: runID + "-" + c + "d1" })[0].cie_y
-      ? _.filter(data, { SampleID: runID + "-" + c + "d1" })[0].cie_y
-      : null;
+
+    const findDataForDot = (dot) =>
+      _.filter(data, { SampleID: runID + "-" + c + "d" + dot })[0];
+
+    const dots = ["4", "3", "2", "1"];
+    let foundData;
+
+    for (let dot of dots) {
+      foundData = findDataForDot(dot);
+      if (foundData) break;
+    }
+
+    if (foundData) {
+      buffer["cie_x"] = foundData.cie_x || null;
+      buffer["cie_y"] = foundData.cie_y || null;
+    } else {
+      console.warn(`No data found for coupon ${c}`);
+      buffer["cie_x"] = null;
+      buffer["cie_y"] = null;
+    }
+
     for (let j = 0; j < dotList.length; j++) {
       let d = dotList[j];
       let matchingData = _.filter(data, {
@@ -188,8 +189,8 @@ function JVLFData2(props) {
         buffer[`d${d}`] = Math.round(cd * 1000) / 1000;
       } else {
         // Handle the case where the dot does not exist
-        console.warn(`Dot ${d} not found in the data`);
-        // You may choose to set a default value or skip this iteration
+        console.warn(`Dot ${d} not found in the data for coupon ${c}`);
+        buffer[`d${d}`] = null;
       }
 
       // let cd = _.filter(data, { SampleID: runID + "-" + c + "d" + d })[0].cd;
@@ -217,55 +218,6 @@ function JVLFData2(props) {
     resArray.push(buffer);
   }
 
-  //   console.log(resArray);
-
-  //   const tableComponent = ["1", "2", "3","4","5","6","7","8","9"].map(function (c) {
-  //     // console.log(c)
-  //     return (
-  //       <tr>
-  //         <td> {`${runID}-${c}`} </td>
-  //         <td>
-  //             {
-  //                 _.filter(data, { "SampleID": runID + "-" + c + "d4" })[0].cie_x ?
-  //                 _.filter(data, { "SampleID": runID + "-" + c + "d4" })[0].cie_x : (
-  //                     _.filter(data, { "SampleID": runID + "-" + c + "d3" })[0].cie_x ?
-  //                     _.filter(data, { "SampleID": runID + "-" + c + "d3" })[0].cie_x : (
-  //                         _.filter(data, { "SampleID": runID + "-" + c + "d2" })[0].cie_x ?
-  //                         _.filter(data, { "SampleID": runID + "-" + c + "d2" })[0].cie_x : (
-  //                             _.filter(data, { "SampleID": runID + "-" + c + "d1" })[0].cie_x ?
-  //                             _.filter(data, { "SampleID": runID + "-" + c + "d1" })[0].cie_x : null
-  //                         )
-  //                     )
-  //                 )
-  //             }
-  //         </td>
-  //         <td>
-  //             {
-  //                 _.filter(data, { "SampleID": runID + "-" + c + "d4" })[0].cie_y ?
-  //                 _.filter(data, { "SampleID": runID + "-" + c + "d4" })[0].cie_y : (
-  //                     _.filter(data, { "SampleID": runID + "-" + c + "d3" })[0].cie_y ?
-  //                     _.filter(data, { "SampleID": runID + "-" + c + "d3" })[0].cie_y : (
-  //                         _.filter(data, { "SampleID": runID + "-" + c + "d2" })[0].cie_y ?
-  //                         _.filter(data, { "SampleID": runID + "-" + c + "d2" })[0].cie_y : (
-  //                             _.filter(data, { "SampleID": runID + "-" + c + "d1" })[0].cie_y ?
-  //                             _.filter(data, { "SampleID": runID + "-" + c + "d1" })[0].cie_y : null
-  //                         )
-  //                     )
-  //                 )
-  //             }
-  //         </td>
-  //         {["1", "2", "3", "4"].map(function (d) {
-  //             const cd = _.filter(data, { "SampleID": runID + "-" + c + "d" + d })[0].cd
-  //             return(
-  //                 <td>
-  //                     {Math.round(cd* 1000) / 1000}
-  //                 </td>
-  //             )
-  //         })}
-  //       </tr>
-  //     );
-  //   });
-
   return (
     <div className="overflow-x-auto w-full">
       <table className="table table-compact w-full">
@@ -287,13 +239,13 @@ function JVLFData2(props) {
             return (
               <tr>
                 <td>{d.SampleID}</td>
-                <td>{d.cie_x}</td>
+                <td>{d.cie_x ? d.cie_x : null}</td>
                 <td
                   className={`${
                     d.cie_y >= 0.04 && d.cie_y < 0.06 ? "bg-yellow-200" : null
                   }`}
                 >
-                  {d.cie_y}
+                  {d.cie_y ? d.cie_y : null}
                 </td>
                 <td>{d.d1}</td>
                 <td>{d.d2}</td>
