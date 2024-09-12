@@ -396,8 +396,8 @@ const LTExpPlot = ({
     console.log("**********************init Exp plot view");
     if (plotsInput) {
       setPreviousPlot(plotsInput);
-      console.log("Set IsFetch = false")
-      setIsFetched(false)
+      console.log("Set IsFetch = false");
+      setIsFetched(false);
     } else {
       setPreviousPlot([]);
     }
@@ -467,7 +467,14 @@ const LTExpPlot = ({
               item.key.includes(`-${couponInfo.couponID}`)
             );
             const sampleID = entry.key;
-            const group = entry.data;
+
+            // Create a new sorted array instead of modifying the original
+            const sortedData = [...entry.data].sort(
+              (a, b) => new Date(a.SampleTime) - new Date(b.SampleTime)
+            );
+            // console.log(sortedData);
+
+            const group = sortedData;
             const divisor = group[0].Luminance;
             const x = group.map((item) => item.TimeInHours);
             const y = group.map((item) => item.Luminance / divisor);
@@ -489,7 +496,7 @@ const LTExpPlot = ({
         })
         .flat(); // Flatten the array since map returns an array of arrays
 
-      setPlotData(prcoessedData.filter(item => item !== null));
+      setPlotData(prcoessedData.filter((item) => item !== null));
       setDataFound(true);
       // console.log("setPlotData", prcoessedData)
     }
@@ -515,14 +522,18 @@ const LTExpPlot = ({
         return o.key.startsWith(sampleID);
       });
 
-      if (sampleID !== "" && sampleID.length === 10 && !isLtExists && !isFetched) {
+      if (
+        sampleID !== "" &&
+        sampleID.length === 10 &&
+        !isLtExists &&
+        !isFetched
+      ) {
         // Fetch LT data for the sampleID
         addLTData(sampleID);
       }
 
-      setIsFetched(true)
+      setIsFetched(true);
     });
-
   }, [plotsInput, ltdataSet, addLTData, isFetched]);
 
   return (
@@ -605,7 +616,12 @@ const LTExpPlot = ({
       </div>
 
       {dataFound ? (
-        <LtPlotView plotData={plotData} sampleID={expTitle} layout={layout} mode={"exp"} />
+        <LtPlotView
+          plotData={plotData}
+          sampleID={expTitle}
+          layout={layout}
+          mode={"exp"}
+        />
       ) : (
         <LtPlotView plotData={[]} sampleID={""} layout={layout} mode={"exp"} />
       )}
@@ -706,7 +722,11 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
         );
         // console.log(entry)
         const sampleID = entry.key;
-        const group = entry.data;
+
+        const sortedData = [...entry.data].sort(
+          (a, b) => new Date(a.SampleTime) - new Date(b.SampleTime)
+        );
+        const group = sortedData;
         const divisor = group[0].Luminance;
         const x = group.map((item) => item.TimeInHours);
         const y = group.map((item) => item.Luminance / divisor);
@@ -787,9 +807,19 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
         </button>
       </div>
       {dataFound ? (
-        <LtPlotView plotData={plotData} sampleID={sampleID} layout={layout} mode={"plate"} />
+        <LtPlotView
+          plotData={plotData}
+          sampleID={sampleID}
+          layout={layout}
+          mode={"plate"}
+        />
       ) : (
-        <LtPlotView plotData={[]} sampleID={sampleID} layout={layout} mode={"plate"}/>
+        <LtPlotView
+          plotData={[]}
+          sampleID={sampleID}
+          layout={layout}
+          mode={"plate"}
+        />
       )}
     </div>
   );
