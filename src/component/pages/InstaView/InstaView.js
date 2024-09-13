@@ -27,6 +27,8 @@ function InstaViewKeyword() {
   const [debouncedKeywordFilter, setDebouncedKeywordFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [emissionSideFilter, setEmissionSideFilter] = useState("all");
+  const [displayMode, setDisplayMode] = useState("oneLine");
 
   const fetchPlateInfo = useCallback(() => {
     setError(null);
@@ -67,6 +69,10 @@ function InstaViewKeyword() {
     []
   );
 
+  const handleDisplayModeToggle = () => {
+    setDisplayMode(displayMode === "oneLine" ? "newLine" : "oneLine");
+  };
+
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
   };
@@ -84,6 +90,10 @@ function InstaViewKeyword() {
   const handleKeywordFilterChange = (e) => {
     setKeywordFilter(e.target.value);
     debouncedSetKeywordFilter(e.target.value);
+  };
+
+  const handleEmissionSideFilterChange = (e) => {
+    setEmissionSideFilter(e.target.value);
   };
 
   const columns = ["RunID", "Date", "keywords", "emissionSide"];
@@ -113,9 +123,14 @@ function InstaViewKeyword() {
         const dateMatch =
           (!startDate || new Date(row.Date) >= new Date(startDate)) &&
           (!endDate || new Date(row.Date) <= new Date(endDate));
-        return runIdMatch && keywordMatch && dateMatch;
+        const emissionSideMatch =
+          emissionSideFilter === "all" ||
+          row.emissionSide?.toLowerCase() === emissionSideFilter.toLowerCase();
+        return runIdMatch && keywordMatch && dateMatch && emissionSideMatch;
       })
     : null;
+
+  console.log("filteredPlateInfo");
 
   return (
     <div className="p-4">
@@ -170,6 +185,42 @@ function InstaViewKeyword() {
             onChange={handleEndDateChange}
           />
         </div>
+        <div className="flex items-center space-x-2">
+          <label htmlFor="emissionSideFilter">Filter by Emission Side:</label>
+          <select
+            id="emissionSideFilter"
+            className="select select-bordered"
+            value={emissionSideFilter}
+            onChange={handleEmissionSideFilterChange}
+          >
+            <option value="all">All</option>
+            <option value="BE">BE</option>
+            <option value="TE">TE</option>
+          </select>
+        </div>
+      </div>
+      <div className="flex items-center space-x-2">
+        <label htmlFor="displayModeToggle" className="mr-2">
+          Display Mode:
+        </label>
+        <input
+          type="checkbox"
+          id="displayModeToggle"
+          className="sr-only"
+          checked={displayMode === "newLine"}
+          onChange={handleDisplayModeToggle}
+        />
+        <label
+          htmlFor="displayModeToggle"
+          className="inline-flex relative items-center cursor-pointer"
+        >
+          <div className="block bg-gray-600 w-14 h-8 rounded-full"></div>
+          <div
+            className={`dot absolute ${
+              displayMode === "newLine" ? "right-1" : "left-1"
+            } top-1 bg-white w-6 h-6 rounded-full transition`}
+          ></div>
+        </label>
       </div>
       {error ? (
         <p className="text-error">Error: {error}</p>
@@ -190,7 +241,25 @@ function InstaViewKeyword() {
               {filteredPlateInfo.map((row, rowIndex) => (
                 <tr key={rowIndex}>
                   {columns.map((column) => (
-                    <td key={column}>{row[column] || "N/A"}</td>
+                    <td key={column}>
+                      {column === "Date"
+                        ? `${new Date(
+                            row[column]
+                          ).toLocaleDateString()} ${new Date(
+                            row[column]
+                          ).getHours()}:${
+                            new Date(row[column]).getMinutes() < 10
+                              ? `0${new Date(row[column]).getMinutes()}`
+                              : `${new Date(row[column]).getMinutes()}`
+                          } ${` (${row.emissionSide || ""})`}`
+                        : column === "keywords" && displayMode === "newLine"
+                        ? row[column]
+                            ?.split("||")
+                            .map((keyword, index) => (
+                              <div key={index}>{keyword}</div>
+                            ))
+                        : row[column] || "N/A"}
+                    </td>
                   ))}
                 </tr>
               ))}
