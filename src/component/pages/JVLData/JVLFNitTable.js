@@ -199,7 +199,8 @@ function JVLFData2(props) {
 
     let lt_cd = 0;
 
-    if (buffer["cie_y"] >= 0.04 && buffer["cie_y"] <= 0.063) {
+    // if (buffer["cie_y"] >= 0.04 && buffer["cie_y"] <= 0.063) {
+    if (buffer["cie_y"] >= 0) {
       lt_cd = buffer["d4"]
         ? buffer["d4"]
         : buffer["d3"]
