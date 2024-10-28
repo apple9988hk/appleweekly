@@ -7,6 +7,7 @@ import { ChevronsDown, ChevronsUp, Search, Underline } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { removeListener } from "@reduxjs/toolkit";
 import { Link } from "react-router-dom";
+import DownloadCSV from "./DownloadCSV";
 
 class SearchParam {}
 
@@ -771,40 +772,52 @@ const LTSinglePlot = ({ sampleID_input, plotRange, onSampleIDChange }) => {
     }
   }, [dataFound, sampleID, previousID, onSampleIDChange, couponList]);
 
+  const data = [
+    { name: "John Doe", age: 30, profession: "Developer" },
+    { name: "Jane Smith", age: 25, profession: "Designer" },
+  ];
+
   return (
     <div>
-      <div className="flex flex-row w-full max-w-md py-5 items-center px-5">
-        <div className="form-control pr-2">
-          <input
-            type="text"
-            placeholder="Input id"
-            className="input input-bordered input-sm w-full max-w-xs"
-            onChange={(e) => {
-              setSampleID(e.target.value);
-            }}
-            value={sampleID}
-          />
+      <div className="flex items-center justify-between">
+        <div className="flex flex-row w-full max-w-md py-5 items-center px-5">
+          <div className="form-control pr-2">
+            <input
+              type="text"
+              placeholder="Input id"
+              className="input input-bordered input-sm w-full max-w-xs"
+              onChange={(e) => {
+                setSampleID(e.target.value);
+              }}
+              value={sampleID}
+            />
+          </div>
+          <div className="form-control pr-2">-</div>
+          <div className="form-control pr-2 flex-1">
+            <input
+              type="text"
+              placeholder=""
+              className="input input-sm input-bordered m w-full max-w-xs"
+              onChange={(e) => {
+                setCouponList(e.target.value);
+              }}
+              value={couponList}
+            />
+          </div>
+          <button
+            className={`btn btn-outline btn-sm ${
+              ltdataStatus === "loading" ? "loading" : ""
+            }`}
+            onClick={addLTData}
+          >
+            Fetch
+          </button>
         </div>
-        <div className="form-control pr-2">-</div>
-        <div className="form-control pr-2 flex-1">
-          <input
-            type="text"
-            placeholder=""
-            className="input input-sm input-bordered m w-full max-w-xs"
-            onChange={(e) => {
-              setCouponList(e.target.value);
-            }}
-            value={couponList}
-          />
-        </div>
-        <button
-          className={`btn btn-outline btn-sm ${
-            ltdataStatus === "loading" ? "loading" : ""
-          }`}
-          onClick={addLTData}
-        >
-          Fetch
-        </button>
+        {plotData && plotData.length > 0 ? (
+          <button className="btn btn-outline btn-sm ml-2">
+            <DownloadCSV data={ltdataSet} fileName={sampleID} />
+          </button>
+        ) : null}
       </div>
       {dataFound ? (
         <LtPlotView
