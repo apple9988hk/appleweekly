@@ -19,7 +19,7 @@ function LEPLotChart(props) {
     "Qe",
     "CdA",
     "LmW",
-    "BI"
+    "BI",
   ];
   const handleInputChange = (e) => {
     const colorsArray = e.target.value
@@ -51,7 +51,7 @@ function LEPLotChart(props) {
         cd={10}
         colorSetting={colorSetting}
       />
-      
+
       <BIChart
         data={jdataset}
         idList={idList}
@@ -74,12 +74,21 @@ function LEPLotChart(props) {
   );
 }
 
-function LEPLotChartOJ() {
+function LEPLotChartOJ(props) {
+  const { cd } = props;
   const ojdataset = useSelector((state) => state.ojdata.data);
   const idList = useSelector((state) => state.ojdata.idList);
   const watchList = useSelector((state) => state.ojdata.watchList);
   const [colorSetting, setColorSetting] = useState([]);
-  const dataToShow = ["Title", "CIE_X", "CIE_Y", "Luminance", "LE", "BI"];
+  const dataToShow = [
+    "Title",
+    "CurrentDensity",
+    "CIE_X",
+    "CIE_Y",
+    "Luminance",
+    "LE",
+    "BI",
+  ];
   const handleInputChange = (e) => {
     const colorsArray = e.target.value
       .split("")
@@ -107,13 +116,13 @@ function LEPLotChartOJ() {
       <LEChart
         data={ojdataset}
         idList={idList}
-        cd={15}
+        cd={cd}
         colorSetting={colorSetting}
       />
       <BIChart
         data={ojdataset}
         idList={idList}
-        cd={15}
+        cd={cd}
         colorSetting={colorSetting}
       />
       <>
@@ -122,8 +131,8 @@ function LEPLotChartOJ() {
             dataToShow={dataToShow}
             data={_.filter(ojdataset, function (o) {
               return (
-                o.Title.slice(0, 10) === watchList[watchList.length - 1] &&
-                o.CurrentDensity === 15
+                o.Title.slice(0, 10) === watchList[watchList.length - 1]
+                // && o.CurrentDensity === cd
               );
             })}
           />
@@ -134,7 +143,8 @@ function LEPLotChartOJ() {
 }
 
 function LEChart(props) {
-  const { data, idList, cd, colorSetting} = props;
+  const { data, idList, cd, colorSetting } = props;
+  // console.log(data);
   let newSeries = [];
   let isColorSetting = colorSetting !== undefined ? true : false;
   const colorOption = [
@@ -167,34 +177,52 @@ function LEChart(props) {
           Number(d.SampleID.slice(11, 12)),
         ]),
       };
-      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
-        seriesConfig.color = colorOption[colorSetting[index]-1];
+      if (
+        isColorSetting &&
+        colorOption[colorSetting[index] - 1] !== undefined
+      ) {
+        seriesConfig.color = colorOption[colorSetting[index] - 1];
       }
       newSeries.push(seriesConfig);
     });
   } else {
-    idList.forEach(function (id, index) {
-      let filtered = _.filter(data, function (o) {
-        return o.Title.slice(0, 10) === id.id && o.CurrentDensity === 15;
+    const cdList = String(cd)
+      .split(",")
+      .map((num) => parseFloat(num));
+    // console.log("cdList", cdList);
+    cdList.forEach((currentCd) => {
+      idList.forEach(function (id, index) {
+        let filtered = _.filter(data, function (o) {
+          // console.log(o.CurrentDensity, cd);
+          return (
+            o.Title.slice(0, 10) === id.id &&
+            parseFloat(o.CurrentDensity) === parseFloat(currentCd)
+          );
+        });
+        // console.log(filtered, "filtered");
+        const seriesConfig = {
+          name: id.id + "_" + currentCd + "J",
+          type: "scatter",
+          emphasis: {
+            focus: "series",
+          },
+          symbolSize: 5,
+          data: filtered.map((d) => [
+            d.CIE_X,
+            d.LE,
+            d.Title,
+            Number(d.Title.slice(11, 12)),
+          ]),
+          cd: currentCd,
+        };
+        if (
+          isColorSetting &&
+          colorOption[colorSetting[index] - 1] !== undefined
+        ) {
+          seriesConfig.color = colorOption[colorSetting[index] - 1];
+        }
+        newSeries.push(seriesConfig);
       });
-      const seriesConfig = {
-        name: id.id,
-        type: "scatter",
-        emphasis: {
-          focus: "series",
-        },
-        symbolSize: 5,
-        data: filtered.map((d) => [
-          d.CIE_X,
-          d.LE,
-          d.Title,
-          Number(d.Title.slice(11, 12)),
-        ]),
-      };
-      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
-        seriesConfig.color = colorOption[colorSetting[index]-1];
-      }
-      newSeries.push(seriesConfig);
     });
   }
   const option = {
@@ -239,7 +267,8 @@ function LEChart(props) {
     },
     brush: {},
     legend: {
-      data: idList.map((id) => id.id),
+      // data: idList.map((id) => id.id),
+      data: newSeries.map((series) => series.name),
       left: "center",
       bottom: 10,
     },
@@ -251,7 +280,7 @@ function LEChart(props) {
         axisLabel: {
           formatter: "{value}",
           showMinLabel: false,
-          showMaxLabel: false
+          showMaxLabel: false,
         },
         nameLocation: "middle",
         nameGap: 30,
@@ -305,7 +334,7 @@ function LEChart(props) {
 }
 
 function BIChart(props) {
-  const { data, idList, cd, colorSetting} = props;
+  const { data, idList, cd, colorSetting } = props;
   let newSeries = [];
   let isColorSetting = colorSetting !== undefined ? true : false;
   const colorOption = [
@@ -338,35 +367,51 @@ function BIChart(props) {
           Number(d.SampleID.slice(11, 12)),
         ]),
       };
-      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
-        seriesConfig.color = colorOption[colorSetting[index]-1];
+      if (
+        isColorSetting &&
+        colorOption[colorSetting[index] - 1] !== undefined
+      ) {
+        seriesConfig.color = colorOption[colorSetting[index] - 1];
       }
       newSeries.push(seriesConfig);
     });
   } else {
-    idList.forEach(function (id, index) {
-      let filtered = _.filter(data, function (o) {
-        return o.Title.slice(0, 10) === id.id && o.CurrentDensity === 15;
+    const cdList = String(cd)
+      .split(",")
+      .map((num) => parseFloat(num));
+    // console.log("cdList", cdList);
+    cdList.forEach((currentCd) => {
+      idList.forEach(function (id, index) {
+        let filtered = _.filter(data, function (o) {
+          // console.log(o.CurrentDensity, cd);
+          return (
+            o.Title.slice(0, 10) === id.id &&
+            parseFloat(o.CurrentDensity) === parseFloat(currentCd)
+          );
+        });
+        console.log(id.id, currentCd);
+        const seriesConfig = {
+          name: id.id + "_" + currentCd + "J",
+          type: "scatter",
+          emphasis: {
+            focus: "series",
+          },
+          symbolSize: 5,
+          data: filtered.map((d) => [
+            d.CIE_Y,
+            d.BI,
+            d.Title,
+            Number(d.Title.slice(11, 12)),
+          ]),
+        };
+        if (
+          isColorSetting &&
+          colorOption[colorSetting[index] - 1] !== undefined
+        ) {
+          seriesConfig.color = colorOption[colorSetting[index] - 1];
+        }
+        newSeries.push(seriesConfig);
       });
-      console.log(filtered)
-      const seriesConfig = {
-        name: id.id,
-        type: "scatter",
-        emphasis: {
-          focus: "series",
-        },
-        symbolSize: 5,
-        data: filtered.map((d) => [
-          d.CIE_Y,
-          d.BI,
-          d.Title,
-          Number(d.Title.slice(11, 12)),
-        ]),
-      };
-      if (isColorSetting && colorOption[colorSetting[index]-1] !== undefined) {
-        seriesConfig.color = colorOption[colorSetting[index]-1];
-      }
-      newSeries.push(seriesConfig);
     });
   }
   const option = {
@@ -411,7 +456,7 @@ function BIChart(props) {
     },
     brush: {},
     legend: {
-      data: idList.map((id) => id.id),
+      data: newSeries.map((id) => id.name),
       left: "center",
       bottom: 10,
     },
@@ -423,7 +468,7 @@ function BIChart(props) {
         axisLabel: {
           formatter: "{value}",
           showMinLabel: false,
-          showMaxLabel: false
+          showMaxLabel: false,
         },
         nameLocation: "middle",
         nameGap: 30,
@@ -478,6 +523,9 @@ function BIChart(props) {
 
 function JTableSingleTable(props) {
   const { data, dataToShow } = props;
+  // console.log(rawData);
+  // console.log(dataToShow);
+  const sortedData = _.orderBy(data, ["CurrentDensity", "Title"]);
   // console.log(data);
   // const dataToShow = [
   //   "SampleID",
@@ -494,7 +542,7 @@ function JTableSingleTable(props) {
   let stat = {};
   dataToShow.map(function (d, index) {
     // console.log(d);
-    return (stat[d] = _.meanBy(data, d));
+    return (stat[d] = _.meanBy(sortedData, d));
   });
   // console.log(stat);
   return (
@@ -532,9 +580,9 @@ function JTableSingleTable(props) {
                   );
                 })}
               </tr>
-              {data.map(function (d, index) {
+              {sortedData.map(function (d, index) {
                 return (
-                  <tr key={data.SampleID}>
+                  <tr key={sortedData.SampleID}>
                     {dataToShow.map(function (title, index) {
                       return (
                         <td

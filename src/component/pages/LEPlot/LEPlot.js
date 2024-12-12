@@ -1,30 +1,27 @@
-import FetchJ, {FetchOJ} from "./FetchJ"
-import FetchedJDisplay, {FetchedJDisplayOJ} from "../JTable/FetchedJDisplay"
-import LEPLotChart, {LEPLotChartOJ} from "./LEPlotChart"
+import FetchJ, { FetchOJ } from "./FetchJ";
+import FetchedJDisplay, { FetchedJDisplayOJ } from "../JTable/FetchedJDisplay";
+import LEPLotChart, { LEPLotChartOJ } from "./LEPlotChart";
+import { useState } from "react";
 
 function LEplot() {
-    return (
-        <div className="max-w-7xl mx-auto px-5 pb-10">
-            <div className ="font-bold text-3xl">
-              LEPlot @10J
-            </div>
-            
-            <FetchJ />
-            <FetchedJDisplay/>
-            <LEPLotChart />
+  const [cd, setCd] = useState(15);
+  return (
+    <div className="max-w-7xl mx-auto px-5 pb-10">
+      <div className="font-bold text-3xl">LEPlot @10J</div>
 
-            <div className ="font-bold text-3xl">
-              LEPlot @ 15J
-            </div>
+      <FetchJ />
+      <FetchedJDisplay />
+      <LEPLotChart />
 
-            <FetchOJ/>
-            <FetchedJDisplayOJ/>
-            <LEPLotChartOJ />
-            
-            {/* <JTableCompare /> */}
-          
-        </div>
-      )
+      <div className="font-bold text-3xl">LEPlot @ {cd}J</div>
+
+      <FetchOJ cd={cd} setCd={setCd} />
+      <FetchedJDisplayOJ />
+      <LEPLotChartOJ cd={cd} />
+
+      {/* <JTableCompare /> */}
+    </div>
+  );
 }
 
-export default LEplot
+export default LEplot;

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchJData, resetJData } from "../../../features/jdata/jdataSlice";
-import { fetchOJData, resetJData as resetOJData  } from "../../../features/ojdata/ojdataSlice";
+import {
+  fetchOJData,
+  resetJData as resetOJData,
+} from "../../../features/ojdata/ojdataSlice";
 
 export default function FetchJ() {
   // const jdataset = useSelector((state) => selectRSById(state, stockId));
@@ -23,10 +26,9 @@ export default function FetchJ() {
   };
 
   const handleResetJData = () => {
-    console.log("hi")
-    dispatch(resetJData())
-  }
-
+    console.log("hi");
+    dispatch(resetJData());
+  };
 
   return (
     <div>
@@ -63,7 +65,8 @@ export default function FetchJ() {
   );
 }
 
-function FetchOJ() {
+function FetchOJ(props) {
+  const { cd, setCd } = props;
   // const jdataset = useSelector((state) => selectRSById(state, stockId));
   const ojstatus = useSelector((state) => state.ojdata.status);
 
@@ -83,13 +86,13 @@ function FetchOJ() {
   };
 
   const handleResetJData = () => {
-    console.log("hi")
-    dispatch(resetOJData())
-  }
+    console.log("hi");
+    dispatch(resetOJData());
+  };
 
   return (
     <div>
-      <div className="flex flex-row w-full max-w-lg py-5 items-start px-5">
+      <div className="flex flex-row w-full max-w-lg pt-5 pb-2 items-start px-5">
         <div className="form-control pr-2 w-full">
           <input
             type="text"
@@ -117,6 +120,18 @@ function FetchOJ() {
           {" "}
           Clear Data{" "}
         </button>
+      </div>
+      <div className="flex flex-row w-full max-w-lg pb-5 pt-2 items-start px-5">
+        <div className="form-control pr-2 w-full">
+          <input
+            type="text"
+            placeholder="Input CD"
+            className="input input-bordered input-sm w-full max-w-2xl"
+            value={cd}
+            onChange={(e) => setCd(e.target.value)}
+          />
+          <span className="label-text-alt px-1">Ex: 1, 15, 120</span>
+        </div>
       </div>
     </div>
   );
