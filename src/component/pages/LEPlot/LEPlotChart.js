@@ -144,7 +144,13 @@ function LEPLotChartOJ(props) {
 
 function LEChart(props) {
   const { data, idList, cd, colorSetting } = props;
-  // console.log(data);
+  // console.log(data.length, "length");
+  console.log(
+    "data",
+    _.filter(data, function (o) {
+      return o.Title.includes("H-121024-F");
+    }).map((o) => ({ Title: o.Title, CurrentDensity: o.CurrentDensity }))
+  );
   let newSeries = [];
   let isColorSetting = colorSetting !== undefined ? true : false;
   const colorOption = [
@@ -389,7 +395,7 @@ function BIChart(props) {
             parseFloat(o.CurrentDensity) === parseFloat(currentCd)
           );
         });
-        console.log(id.id, currentCd);
+        // console.log(id.id, currentCd);
         const seriesConfig = {
           name: id.id + "_" + currentCd + "J",
           type: "scatter",

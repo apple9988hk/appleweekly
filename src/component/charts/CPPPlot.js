@@ -2,8 +2,8 @@ import React from "react";
 import ReactEcharts from "echarts-for-react";
 
 function CPPPlot(props) {
-  const {data} = props
-  console.log(data)
+  const { data } = props;
+  // console.log(data)
   const option = {
     xAxis: {
       type: "time",
@@ -25,9 +25,9 @@ function CPPPlot(props) {
       },
     ],
     legend: {
-      data: ['c1-Pressure', 'c2-Pressure', 'c1-Cryo Temp', 'c2-Cryo Temp'],
+      data: ["c1-Pressure", "c2-Pressure", "c1-Cryo Temp", "c2-Cryo Temp"],
       animation: false,
-  },
+    },
     tooltip: {
       trigger: "axis",
       axisPointer: {
@@ -77,7 +77,7 @@ function CPPPlot(props) {
         showSymbol: false,
       },
     ],
-    animation: false
+    animation: false,
   };
 
   return (

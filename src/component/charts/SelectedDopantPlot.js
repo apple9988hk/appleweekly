@@ -3,7 +3,7 @@ import ReactEcharts from "echarts-for-react";
 
 function ChartPlot(props) {
   const { Qe, RunID, Voltage, date, keyword, material } = props.data;
-  console.log(props.data)
+  // console.log(props.data)
   const option = {
     title: {
       text: material,
@@ -22,12 +22,16 @@ function ChartPlot(props) {
         },
       },
       formatter: function (params) {
-        var res = RunID[params[0].dataIndex] + '<br/>' + params[0].name;
-        for (var i = 0, l = params.length; i <2; i++ ){
-          res += '<br/> <span style="font-weight:bold;">'+  params[i].seriesName +'</span> :' + params[i].value;
+        var res = RunID[params[0].dataIndex] + "<br/>" + params[0].name;
+        for (var i = 0, l = params.length; i < 2; i++) {
+          res +=
+            '<br/> <span style="font-weight:bold;">' +
+            params[i].seriesName +
+            "</span> :" +
+            params[i].value;
         }
-        return res
-      }
+        return res;
+      },
     },
     legend: {
       data: ["EQE", "Voltage"],
@@ -83,7 +87,7 @@ function ChartPlot(props) {
         type: "line",
         smooth: true,
         data: Qe,
-        runId: RunID
+        runId: RunID,
       },
       {
         name: "Voltage",
@@ -91,7 +95,7 @@ function ChartPlot(props) {
         type: "line",
         smooth: true,
         data: Voltage,
-        runId: RunID
+        runId: RunID,
       },
     ],
   };
@@ -105,7 +109,7 @@ function SelectedDopantPlot(props) {
   const dataset = props.data;
   const { id, topic, data } = dataset;
   return (
-    <div className = "py-2">
+    <div className="py-2">
       {/* <h1 className="font-bold text-2xl px-2 underline py-2 "> {topic}</h1> */}
       {data.map((d) => (
         <ChartPlot key={d.material} data={d} />

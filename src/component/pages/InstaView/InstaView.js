@@ -41,7 +41,7 @@ function InstaViewKeyword() {
         return response.json();
       })
       .then((data) => {
-        console.log("Fetched data:", data);
+        // console.log("Fetched data:", data);
         setPlateInfo(data.data);
       })
       .catch((error) => {
@@ -130,7 +130,7 @@ function InstaViewKeyword() {
       })
     : null;
 
-  console.log("filteredPlateInfo");
+  // console.log("filteredPlateInfo");
 
   return (
     <div className="p-4">

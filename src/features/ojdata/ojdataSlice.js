@@ -16,20 +16,19 @@ export const fetchOJData = createAsyncThunk("users/fetchOJData", async (id) => {
   const snapshot = await axios.get(
     `http://tmdata.udc.local/api/spectral/oj/${id}`
   );
-  console.log(snapshot);
+  // console.log(snapshot);
   if (snapshot.status === 200) {
     newdata = snapshot.data;
-    console.log(newdata);
-    console.log("first")
+    // console.log(newdata);
+    // console.log("first");
   }
   newdata = newdata.map((d) => {
     return {
       ...d,
       LE: (d.Luminance / d.CurrentDensity) * 0.1,
-      BI: (d.Luminance / d.CurrentDensity) * 0.1 /d.CIE_Y
+      BI: ((d.Luminance / d.CurrentDensity) * 0.1) / d.CIE_Y,
     };
   });
-
 
   return newdata;
 });
@@ -47,11 +46,11 @@ export const ojdataSlice = createSlice({
     resetJData(state, action) {
       // console.log(action)
       // console.log("resetJ")
-      state.data = []
-      state.idList = []
-      state.status = "idle"
-      state.error = null
-      state.watchList = []
+      state.data = [];
+      state.idList = [];
+      state.status = "idle";
+      state.error = null;
+      state.watchList = [];
     },
     addtoWatchList: (state, action) => {
       const index = state.watchList.indexOf(action.payload);
@@ -61,24 +60,34 @@ export const ojdataSlice = createSlice({
       }
       state.watchList.push(action.payload);
     },
-    move_id_up: (state,action) => {
+    move_id_up: (state, action) => {
       const { payload: elementName } = action;
-      const index = state.idList.findIndex((element) => element.id === elementName);
+      const index = state.idList.findIndex(
+        (element) => element.id === elementName
+      );
 
       if (index > 0) {
         // Swap the element with the previous one
-        [state.idList[index - 1], state.idList[index]] = [state.idList[index], state.idList[index - 1]];
+        [state.idList[index - 1], state.idList[index]] = [
+          state.idList[index],
+          state.idList[index - 1],
+        ];
       }
     },
-    move_id_down: (state,action) => {
+    move_id_down: (state, action) => {
       const { payload: elementName } = action;
-      const index = state.idList.findIndex((element) => element.id === elementName);
+      const index = state.idList.findIndex(
+        (element) => element.id === elementName
+      );
 
       if (index < state.idList.length - 1) {
         // Swap the element with the previous one
-        [state.idList[index], state.idList[index + 1]] = [state.idList[index + 1], state.idList[index]];
+        [state.idList[index], state.idList[index + 1]] = [
+          state.idList[index + 1],
+          state.idList[index],
+        ];
       }
-    }
+    },
   },
   extraReducers: {
     [fetchOJData.pending]: (state, action) => {
@@ -91,11 +100,14 @@ export const ojdataSlice = createSlice({
 
       action.payload.forEach((newElement) => {
         const elementName = newElement.Title;
+        const currentDensity = newElement.CurrentDensity;
         const existingElementIndex = state.data.findIndex(
-          (element) => element.Title === elementName
+          (element) =>
+            element.Title === elementName &&
+            element.CurrentDensity === currentDensity
         );
 
-        // If the element with the same name already exists, delete it before appending the new element
+        // If the element with the same name and currentDensity already exists, delete it before appending the new element
         if (existingElementIndex !== -1) {
           state.data.splice(existingElementIndex, 1);
         }
@@ -116,8 +128,7 @@ export const ojdataSlice = createSlice({
         }
         // Append the newElement to state.data
         state.idList.push({ id: newId, keywords: "" });
-
-      })
+      });
 
       // uniqueFilenames.forEach((d) => {
       //   if (!state.idList.includes(d)) {
@@ -138,5 +149,6 @@ export const ojdataSlice = createSlice({
   },
 });
 
-export const { toIdle, addtoWatchList, move_id_up, move_id_down, resetJData } = ojdataSlice.actions;
+export const { toIdle, addtoWatchList, move_id_up, move_id_down, resetJData } =
+  ojdataSlice.actions;
 export default ojdataSlice.reducer;

@@ -6,25 +6,30 @@ function OJTable() {
   const ojdataset = useSelector((state) => state.ojdata.data);
   const idList = useSelector((state) => state.ojdata.idList);
   const watchList = useSelector((state) => state.ojdata.watchList);
-  var cdList = useSelector((state) => state.ojdata.cdList)
-  cdList = cdList.length >0 ?  _.sortBy(cdList, function(o) { return o.cd}) : []
-  const [selectedCD, setSelectedCD] = useState( cdList.length > 0 ? cdList[0] : 0)
-
-  console.log(  
-    _.filter(ojdataset, function (o) {
-      return o.Title.slice(0, 10) === watchList[0];
-    })
+  var cdList = useSelector((state) => state.ojdata.cdList);
+  cdList =
+    cdList.length > 0
+      ? _.sortBy(cdList, function (o) {
+          return o.cd;
+        })
+      : [];
+  const [selectedCD, setSelectedCD] = useState(
+    cdList.length > 0 ? cdList[0] : 0
   );
+
+  // console.log(
+  //   _.filter(ojdataset, function (o) {
+  //     return o.Title.slice(0, 10) === watchList[0];
+  //   })
+  // );
   return (
     <div>
       OJTable
       <>
-          <ul className="menu menu-vertical lg:menu-horizontal bg-base-200 rounded-box">
-          {
-            cdList.map((cd) => (
-              <button className="btn" > {cd.cd} </button>
-            ))
-          }
+        <ul className="menu menu-vertical lg:menu-horizontal bg-base-200 rounded-box">
+          {cdList.map((cd) => (
+            <button className="btn"> {cd.cd} </button>
+          ))}
         </ul>
       </>
       <>
@@ -37,11 +42,13 @@ function OJTable() {
           <OJTableSingle
             data={_.filter(ojdataset, function (o) {
               return (
-                o.Title.slice(0, 10) === watchList[watchList.length - 1] && o.CurrentDensity === 15
+                o.Title.slice(0, 10) === watchList[watchList.length - 1] &&
+                o.CurrentDensity === 15
               );
             })}
           />
-        ) : null} */
+        ) : null}{" "}
+        */
       </>
     </div>
   );
@@ -49,20 +56,14 @@ function OJTable() {
 
 function OJTableSingle(props) {
   const { data } = props;
-  console.log(data);
-  const dataToShow = [
-    "Title",
-    "CurrentDensity",
-    "CIE_X",
-    "CIE_Y",
-    "Luminance",
-  ];
+  // console.log(data);
+  const dataToShow = ["Title", "CurrentDensity", "CIE_X", "CIE_Y", "Luminance"];
   let stat = {};
   dataToShow.map(function (d, index) {
-    console.log(d);
+    // console.log(d);
     return (stat[d] = _.meanBy(data, d));
   });
-  console.log(stat);
+  // console.log(stat);
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-grow overflow-auto">
@@ -84,13 +85,20 @@ function OJTableSingle(props) {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             <>
-            <tr>
-              {dataToShow.map(function (d, index) {
-                return <td key={index} className="px-6 py-2 whitespace-nowrap text-sm bg-yellow-200 text-center">
-                    {d === "Title" ? "Average" : Math.round(stat[d] * 1000) / 1000}
-                    </td>;
-              })}
-            </tr>
+              <tr>
+                {dataToShow.map(function (d, index) {
+                  return (
+                    <td
+                      key={index}
+                      className="px-6 py-2 whitespace-nowrap text-sm bg-yellow-200 text-center"
+                    >
+                      {d === "Title"
+                        ? "Average"
+                        : Math.round(stat[d] * 1000) / 1000}
+                    </td>
+                  );
+                })}
+              </tr>
               {data.map(function (d, index) {
                 return (
                   <tr key={data.SampleID}>

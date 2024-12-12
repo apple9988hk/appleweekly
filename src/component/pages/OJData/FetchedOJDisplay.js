@@ -11,9 +11,9 @@ function FetchedOJDisplay() {
   //   ...new Set(jdataset.map(({ SampleID }) => SampleID.slice(0, 10))),
   // ];
 
-  console.log("ojdataset");
-  console.log(idList)
-  console.log(ojdataset);
+  // console.log("ojdataset");
+  // console.log(idList)
+  // console.log(ojdataset);
 
   return (
     <div>
@@ -39,10 +39,10 @@ function SortableTable(props) {
               return (
                 <tr
                   key={index}
-                  onClick={() => dispatch(addtoWatchList(d['id']))}
+                  onClick={() => dispatch(addtoWatchList(d["id"]))}
                 >
                   <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
-                    {d['id']}
+                    {d["id"]}
                   </td>
                   <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500 text-center">
                     {d["keywords"]}
