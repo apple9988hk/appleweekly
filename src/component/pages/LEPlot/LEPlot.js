@@ -11,7 +11,7 @@ function LEplot() {
 
       <FetchJ />
       <FetchedJDisplay />
-      <LEPLotChart />
+      <LEPLotChart cd={10} />
 
       <div className="font-bold text-3xl">LEPlot @ {cd}J</div>
 
